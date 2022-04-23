@@ -1,11 +1,13 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 @SuppressWarnings("serial")
 public class AddAnimalDialog extends JDialog {
+	private Random random = new Random();
 
 	enum FishColors {
 		BLACK, RED, BLUE, GREEN, CYAN, ORANGE, YELLOW, MAGENTA, PINK,
@@ -97,6 +99,8 @@ public class AddAnimalDialog extends JDialog {
 							int size = Integer.parseInt(animalSize_txtField.getText());
 							int verSpd = Integer.parseInt(animalVerSpd_txtField.getText());
 							int horSpd = Integer.parseInt(animalHorSpd_txtField.getText());
+							int x_pos = random.nextInt(AquaFrame.panel.getWidth());
+							int y_pos = random.nextInt(AquaFrame.panel.getWidth());
 
 							if (size < 20 || size > 320)
 								throw new IllegalStateException();
@@ -106,10 +110,10 @@ public class AddAnimalDialog extends JDialog {
 							Color c = colorByIndex(animalColor_cb.getSelectedIndex());
 
 							if (animalType_cb.getSelectedIndex() == 0) {
-								Fish f = new Fish(size, 400, 300, horSpd, verSpd, c);
+								Fish f = new Fish(size, x_pos, y_pos, horSpd, verSpd, c);
 								AquaPanel.sealife.add(f);
 							} else {
-								Jellyfish j = new Jellyfish(size, 400, 300, horSpd, verSpd, c);
+								Jellyfish j = new Jellyfish(size, x_pos, y_pos, horSpd, verSpd, c);
 								AquaPanel.sealife.add(j);
 							}
 							AquaFrame.tableModel.setRowCount(0);
