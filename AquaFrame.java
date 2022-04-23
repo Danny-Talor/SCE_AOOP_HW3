@@ -105,6 +105,7 @@ public class AquaFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				AquaPanel.sealife.clear();
 				tableModel.setRowCount(0);
+				panel.repaint();
 			}
 		});
 		btnReset.setFont(new Font("Arial", Font.BOLD, 17));
