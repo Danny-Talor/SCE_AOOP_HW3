@@ -12,7 +12,7 @@ public class AddAnimalDialog extends JDialog {
 	enum FishColors {
 		BLACK, RED, BLUE, GREEN, CYAN, ORANGE, YELLOW, MAGENTA, PINK,
 	}
-
+	private boolean isOpen = false;
 	private final JPanel contentPanel = new JPanel();
 	private JComboBox animalType_cb;
 	private JTextField animalVerSpd_txtField;
@@ -126,6 +126,7 @@ public class AddAnimalDialog extends JDialog {
 							Object[] total = {"Total","","","","",totalEatCounter};
 							AquaFrame.tableModel.addRow(total);
 							AquaFrame.panel.repaint();
+							AquaFrame.btnAddAnimal.setEnabled(true);
 							dispose();
 						} catch (NumberFormatException ex) {
 							JOptionPane.showMessageDialog(null, "Fields must contain numbers!");
@@ -133,8 +134,8 @@ public class AddAnimalDialog extends JDialog {
 							JOptionPane.showMessageDialog(null, "Size must be between 20 to 320!");
 						} catch (IllegalArgumentException ex) {
 							JOptionPane.showMessageDialog(null, "Speed must be between 1 to 10!");
-
 						}
+						
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -145,7 +146,7 @@ public class AddAnimalDialog extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-
+						AquaFrame.btnAddAnimal.setEnabled(true);
 						dispose();
 					}
 				});
