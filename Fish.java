@@ -99,7 +99,7 @@ public class Fish extends Swimmable {
 	}
 
 	/**
-	 * @return String whith the color of the fish
+	 * @return String with the color of the fish
 	 */
 	public String getColor() {
 		String rgb = String.valueOf(this.col.getRed()) + "," + String.valueOf(this.col.getGreen()) + ","
