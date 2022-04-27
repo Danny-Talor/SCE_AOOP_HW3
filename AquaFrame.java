@@ -18,7 +18,7 @@ public class AquaFrame extends JFrame {
 		};
 	};
 
-	JButton btnAddAnimal;
+	static JButton btnAddAnimal;
 
 	/**
 	 * Launch the application.
@@ -72,11 +72,7 @@ public class AquaFrame extends JFrame {
 				AddAnimalDialog addAnimalDialog = new AddAnimalDialog();
 				addAnimalDialog.setVisible(true);
 				addAnimalDialog.setAlwaysOnTop(true);
-				addAnimalDialog.addWindowListener(new WindowAdapter() {
-					public void windowClosing(WindowEvent windowEvent) {
-
-					}
-				});
+				btnAddAnimal.setEnabled(false);
 			}
 		});
 		btnAddAnimal.setFont(new Font("Arial", Font.BOLD, 17));
@@ -129,6 +125,15 @@ public class AquaFrame extends JFrame {
 
 		btnInfo.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnInfo);
+		
+		JButton btnNewButton = new JButton("Exit");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		btnNewButton.setFont(new Font("Arial", Font.BOLD, 17));
+		horizontalBox.add(btnNewButton);
 
 		Component horizontalGlue_1 = Box.createHorizontalGlue();
 		horizontalBox.add(horizontalGlue_1);
