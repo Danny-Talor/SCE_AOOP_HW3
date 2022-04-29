@@ -100,7 +100,7 @@ public class AddAnimalDialog extends JDialog {
 							int verSpd = Integer.parseInt(animalVerSpd_txtField.getText());
 							int horSpd = Integer.parseInt(animalHorSpd_txtField.getText());
 							int x_pos = random.nextInt(AquaFrame.panel.getWidth());
-							int y_pos = random.nextInt(AquaFrame.panel.getWidth());
+							int y_pos = random.nextInt(AquaFrame.panel.getHeight());
 
 							if (size < 20 || size > 320)
 								throw new IllegalStateException();
