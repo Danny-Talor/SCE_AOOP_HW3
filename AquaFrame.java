@@ -19,6 +19,7 @@ public class AquaFrame extends JFrame {
 	};
 
 	static JButton btnAddAnimal;
+	static JButton btnFood;
 
 	/**
 	 * Launch the application.
@@ -41,20 +42,20 @@ public class AquaFrame extends JFrame {
 	 */
 	public AquaFrame() {
 		//
-		//AquaFrame  
+		// AquaFrame
 		//
 		setResizable(false);
 		setTitle("HW2");
 		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		//
 		panel.setOpaque(false);
 		panel.setLocation(0, 0);
 		panel.setSize(786, 541);
 		panel.setRequestFocusEnabled(false);
 		panel.setLayout(null);
-		
+
 		horizontalBox.setAlignmentY(Component.CENTER_ALIGNMENT);
 		horizontalBox.setBorder(null);
 		horizontalBox.setForeground(SystemColor.menuText);
@@ -107,7 +108,22 @@ public class AquaFrame extends JFrame {
 		btnReset.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnReset);
 
-		JButton btnFood = new JButton("Food");
+		btnFood = new JButton("Food");
+		btnFood.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (!panel.hasWorm && AquaPanel.sealife.size() > 0) {
+					try {
+						panel.createBarrier();
+						panel.setWorm();
+						panel.repaint();
+						btnFood.setEnabled(false);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+
+				}
+			}
+		});
 		btnFood.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnFood);
 
@@ -116,6 +132,7 @@ public class AquaFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (scrollPane.isVisible()) {
 					scrollPane.setVisible(false);
+					initializeTable();
 				} else {
 					scrollPane.setVisible(true);
 				}
@@ -125,7 +142,7 @@ public class AquaFrame extends JFrame {
 
 		btnInfo.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnInfo);
-		
+
 		JButton btnNewButton = new JButton("Exit");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -137,14 +154,14 @@ public class AquaFrame extends JFrame {
 
 		Component horizontalGlue_1 = Box.createHorizontalGlue();
 		horizontalBox.add(horizontalGlue_1);
-		
+
 		scrollPane.setEnabled(false);
 		scrollPane.setLocation(0, 0);
 		scrollPane.setSize(786, 500);
 		scrollPane.setAutoscrolls(true);
 		scrollPane.setFocusable(false);
 		scrollPane.setVisible(false);
-		
+
 		tableModel = new DefaultTableModel(tableHeaders, 0);
 		table.setModel(tableModel);
 
@@ -152,12 +169,11 @@ public class AquaFrame extends JFrame {
 
 		getContentPane().add(layeredPane, BorderLayout.CENTER);
 
-		
 		// layer 0 - color panel
 		// layer 1 - image panel
 		// layer 2 - fish panel
 		// layer 3 - scrollpane(table)
-		
+
 		layeredPane.add(panel);
 		layeredPane.setLayer(panel, 2);
 		layeredPane.add(scrollPane);
@@ -174,7 +190,7 @@ public class AquaFrame extends JFrame {
 		layeredPane.add(imagePanel);
 		layeredPane.setLayer(imagePanel, 1);
 		imagePanel.setVisible(false);
-		
+
 		JPanel colorPanel = new JPanel();
 		colorPanel.setBounds(0, 0, 786, 541);
 		layeredPane.add(colorPanel);
@@ -237,5 +253,18 @@ public class AquaFrame extends JFrame {
 			}
 		});
 		mnHelp.add(help_About);
+	}
+
+	public static void initializeTable() {
+		int totalEatCounter = 0;
+		AquaFrame.tableModel.setRowCount(0);
+		for (Swimmable animal : AquaPanel.sealife) {
+			totalEatCounter += animal.getEatCount();
+			Object[] objs = { animal.getAnimalName(), animal.getColor(), animal.getSize(), animal.getHorSpeed(),
+					animal.getVerSpeed(), animal.getEatCount() };
+			AquaFrame.tableModel.addRow(objs);
+		}
+		Object[] total = { "Total", "", "", "", "", totalEatCounter };
+		AquaFrame.tableModel.addRow(total);
 	}
 }

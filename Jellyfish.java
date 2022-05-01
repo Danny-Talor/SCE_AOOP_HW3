@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 public class Jellyfish extends Swimmable {
@@ -8,6 +9,7 @@ public class Jellyfish extends Swimmable {
 	private int eatCount;
 	private int x_front, y_front, x_dir, y_dir;
 	private boolean isSuspended = false;
+	private CyclicBarrier barrier = null;
 
 	public Jellyfish() {
 		super();
@@ -151,36 +153,93 @@ public class Jellyfish extends Swimmable {
 	}
 
 	public void setBarrier(CyclicBarrier b) {
-		// TODO Auto-generated method stub
+		barrier = b;
 	}
 
 	public void run() {
 
-		if (isSuspended) {
-			synchronized (this) {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+		try {
+			if (isSuspended) { // if the user press on sleep button
+				if (AquaFrame.panel.hasWorm) {
+					if (barrier != null)
+						barrier.await();
+					synchronized (this) {
+						wait();
+					}
 				}
+			} else {
+				if (AquaFrame.panel.hasWorm)
+					eatWorm();
+				else
+					move();
 			}
-		}
-		if (x_front >= AquaFrame.panel.getWidth() || x_front < 0) {
-			x_dir = x_dir * -1;
-			super.horSpeed = super.horSpeed * -1;
-		}
 
-		x_front += (super.horSpeed * 1);
-
-		if (y_front >= AquaFrame.panel.getHeight() || y_front < 0) {
-			y_dir = y_dir * -1;
-			super.verSpeed = super.verSpeed * -1;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return;
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
 		}
-
-		y_front += (super.verSpeed * 1);
 
 		AquaFrame.panel.repaint();
+	}
+	
+public void move() {
+		
+		if(x_front > AquaFrame.panel.getWidth())
+		    x_dir = -1;
+		if(y_front > AquaFrame.panel.getHeight())
+		    y_dir = -1;
+		if(x_front <0)
+		    x_dir = 1;
+		if(y_front <0)
+		    y_dir = 1;
+		
+		this.x_front+=horSpeed*x_dir;
+		this.y_front+=verSpeed*y_dir;
+	}
 
+	public void eatWorm() {
+		if (barrier != null) {
+			try {
+				barrier.await();
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (BrokenBarrierException e) {
+				e.printStackTrace();
+			}
+
+		}
+	    barrier = null;
+
+		double v_old = Math.sqrt(horSpeed * horSpeed + verSpeed * verSpeed);
+		double k = (Math.abs((double) y_front - (double) (AquaFrame.panel.getHeight()) / 2)
+				/ Math.abs((double) x_front - (double) (AquaFrame.panel.getWidth()) / 2));
+		double newHorSpeed = v_old / Math.sqrt(k * k + 1);
+		double newVerSpeed = newHorSpeed * k;
+
+		if (x_front >= AquaFrame.panel.getWidth() / 2 || x_front < 0)
+			x_dir = - 1;
+		else
+			x_dir = 1;
+		if (y_front > AquaFrame.panel.getHeight() / 2)
+			y_dir = -1;
+		else
+			y_dir = 1;
+		x_front += newHorSpeed * x_dir;
+		y_front += newVerSpeed * y_dir;
+
+		synchronized (this) {
+			// If fish is 5 pixels away from the worm
+			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5) && (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
+				AquaFrame.panel.wormEatenBy(this);
+				AquaFrame.panel.setWorm();
+				AquaFrame.btnFood.setEnabled(true);
+				AquaFrame.panel.repaint();
+				AquaFrame.initializeTable();
+			}
+		}
 	}
 
 }

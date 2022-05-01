@@ -5,14 +5,13 @@ import java.util.Random;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({ "unchecked", "rawtypes","serial" })
 public class AddAnimalDialog extends JDialog {
 	private Random random = new Random();
 
 	enum FishColors {
 		BLACK, RED, BLUE, GREEN, CYAN, ORANGE, YELLOW, MAGENTA, PINK,
 	}
-	private boolean isOpen = false;
 	private final JPanel contentPanel = new JPanel();
 	private JComboBox animalType_cb;
 	private JTextField animalVerSpd_txtField;
@@ -94,7 +93,7 @@ public class AddAnimalDialog extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						int totalEatCounter = 0;
+						
 						try {
 							int size = Integer.parseInt(animalSize_txtField.getText());
 							int verSpd = Integer.parseInt(animalVerSpd_txtField.getText());
@@ -116,15 +115,7 @@ public class AddAnimalDialog extends JDialog {
 								Jellyfish j = new Jellyfish(size, x_pos, y_pos, horSpd, verSpd, c);
 								AquaPanel.sealife.add(j);
 							}
-							AquaFrame.tableModel.setRowCount(0);
-							for (Swimmable animal : AquaPanel.sealife) {
-								totalEatCounter += animal.getEatCount();
-								Object[] objs = { animal.getAnimalName(), animal.getColor(), animal.getSize(),
-										animal.getHorSpeed(), animal.getVerSpeed(), animal.getEatCount() };
-								AquaFrame.tableModel.addRow(objs);
-							}
-							Object[] total = {"Total","","","","",totalEatCounter};
-							AquaFrame.tableModel.addRow(total);
+							AquaFrame.initializeTable();
 							AquaFrame.panel.repaint();
 							AquaFrame.btnAddAnimal.setEnabled(true);
 							dispose();
