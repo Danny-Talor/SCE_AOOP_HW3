@@ -5,6 +5,7 @@ import java.awt.event.*;
 
 @SuppressWarnings("serial")
 public class AquaFrame extends JFrame {
+	static int totalEatCounter = 0;
 	JLayeredPane layeredPane = new JLayeredPane();
 	static AquaPanel panel = new AquaPanel();
 	Box horizontalBox = Box.createHorizontalBox();
@@ -256,10 +257,8 @@ public class AquaFrame extends JFrame {
 	}
 
 	public static void initializeTable() {
-		int totalEatCounter = 0;
 		AquaFrame.tableModel.setRowCount(0);
 		for (Swimmable animal : AquaPanel.sealife) {
-			totalEatCounter += animal.getEatCount();
 			Object[] objs = { animal.getAnimalName(), animal.getColor(), animal.getSize(), animal.getHorSpeed(),
 					animal.getVerSpeed(), animal.getEatCount() };
 			AquaFrame.tableModel.addRow(objs);

@@ -75,6 +75,7 @@ public class AquaPanel extends JPanel {
 
 	public void wormEatenBy(Swimmable obj) {
 		obj.eatInc();
+		AquaFrame.totalEatCounter++;
 	}
 	
 	public void createBarrier() {
