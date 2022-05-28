@@ -46,7 +46,7 @@ public class AquaFrame extends JFrame {
 		// AquaFrame
 		//
 		setResizable(false);
-		setTitle("HW2");
+		setTitle("HW3");
 		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -249,7 +249,7 @@ public class AquaFrame extends JFrame {
 		JMenuItem help_About = new JMenuItem("About");
 		help_About.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "Home Work 2\nGUI @ Threads");
+				JOptionPane.showMessageDialog(null, "Home Work 3\nGUI @ Threads");
 
 			}
 		});
