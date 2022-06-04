@@ -125,7 +125,7 @@ public class Jellyfish extends Swimmable {
 		else if (rgb.equals("255,105,180"))
 			return "Pink";
 		else
-			return "Black";
+			return rgb;
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class Jellyfish extends Swimmable {
 		this.size++;
 	}
 
-	public void drawAnimal(Graphics g) {
+	public void drawCreature(Graphics g) {
 		int numLegs;
 		if (size < 40)
 			numLegs = 5;
@@ -153,14 +153,15 @@ public class Jellyfish extends Swimmable {
 	}
 
 	public void setBarrier(CyclicBarrier b) {
-		barrier = b;
+		this.barrier = b;
 	}
 
 	public void run() {
 
 		try {
+			Thread.sleep(60);
 			if (isSuspended) { // if the user press on sleep button
-				if (AquaFrame.panel.hasWorm) {
+				if (AquaPanel.wormInstance != null) {
 					if (barrier != null)
 						barrier.await();
 					synchronized (this) {
@@ -168,7 +169,7 @@ public class Jellyfish extends Swimmable {
 					}
 				}
 			} else {
-				if (AquaFrame.panel.hasWorm)
+				if (AquaPanel.wormInstance != null)
 					eatWorm();
 				else
 					move();
@@ -234,7 +235,7 @@ public void move() {
 			// If fish is 5 pixels away from the worm
 			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5) && (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
 				AquaFrame.panel.wormEatenBy(this);
-				AquaFrame.panel.setWorm();
+				Singleton.set();
 				AquaFrame.btnFood.setEnabled(true);
 				AquaFrame.panel.repaint();
 				AquaFrame.initializeTable();

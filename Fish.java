@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.util.concurrent.*;
 
-public class Fish extends Swimmable {
+public class Fish extends Swimmable{
 	private int EAT_DISTANCE = 4;
 	private int size;
 	private Color col;
@@ -122,7 +122,7 @@ public class Fish extends Swimmable {
 		else if (rgb.equals("255,105,180"))
 			return "Pink";
 		else
-			return "Black";
+			return rgb;
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class Fish extends Swimmable {
 		this.size++;
 	}
 
-	public void drawAnimal(Graphics g) {
+	public void drawCreature(Graphics g) {
 		g.setColor(col);
 		if (x_dir == 1) // fish swims to right side
 		{
@@ -188,14 +188,15 @@ public class Fish extends Swimmable {
 	}
 
 	public void setBarrier(CyclicBarrier b) {
-		barrier = b;
+		this.barrier = b;
 	}
 
 	public void run() {
 
 		try {
+			Thread.sleep(60);
 			if (isSuspended) { // if the user press on sleep button
-				if (AquaFrame.panel.hasWorm) {
+				if (AquaPanel.wormInstance != null) {
 					if (barrier != null)
 						barrier.await();
 					synchronized (this) {
@@ -203,7 +204,7 @@ public class Fish extends Swimmable {
 					}
 				}
 			} else {
-				if (AquaFrame.panel.hasWorm)
+				if (AquaPanel.wormInstance != null)
 					eatWorm();
 				else
 					move();
@@ -220,33 +221,31 @@ public class Fish extends Swimmable {
 	}
 
 	public void move() {
-		
-		if(x_front > AquaFrame.panel.getWidth())
-		    x_dir = -1;
-		if(y_front > AquaFrame.panel.getHeight())
-		    y_dir = -1;
-		if(x_front <0)
-		    x_dir = 1;
-		if(y_front <0)
-		    y_dir = 1;
-		
-		this.x_front+=horSpeed*x_dir;
-		this.y_front+=verSpeed*y_dir;
+
+		if (x_front > AquaFrame.panel.getWidth())
+			x_dir = -1;
+		if (y_front > AquaFrame.panel.getHeight())
+			y_dir = -1;
+		if (x_front < 0)
+			x_dir = 1;
+		if (y_front < 0)
+			y_dir = 1;
+
+		this.x_front += horSpeed * x_dir;
+		this.y_front += verSpeed * y_dir;
 	}
 
 	public void eatWorm() {
 		if (barrier != null) {
 			try {
 				barrier.await();
-
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (BrokenBarrierException e) {
 				e.printStackTrace();
 			}
-
 		}
-	    barrier = null;
+		barrier = null;
 
 		double v_old = Math.sqrt(horSpeed * horSpeed + verSpeed * verSpeed);
 		double k = (Math.abs((double) y_front - (double) (AquaFrame.panel.getHeight()) / 2)
@@ -255,7 +254,7 @@ public class Fish extends Swimmable {
 		double newVerSpeed = newHorSpeed * k;
 
 		if (x_front >= AquaFrame.panel.getWidth() / 2 || x_front < 0)
-			x_dir = - 1;
+			x_dir = -1;
 		else
 			x_dir = 1;
 		if (y_front > AquaFrame.panel.getHeight() / 2)
@@ -264,12 +263,14 @@ public class Fish extends Swimmable {
 			y_dir = 1;
 		x_front += newHorSpeed * x_dir;
 		y_front += newVerSpeed * y_dir;
-
 		synchronized (this) {
 			// If fish is 5 pixels away from the worm
-			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5) && (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
+			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5)
+					&& (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
+
 				AquaFrame.panel.wormEatenBy(this);
-				AquaFrame.panel.setWorm();
+				Singleton.set();
+				AquaPanel.wormInstance = null;
 				AquaFrame.btnFood.setEnabled(true);
 				AquaFrame.panel.repaint();
 				AquaFrame.initializeTable();

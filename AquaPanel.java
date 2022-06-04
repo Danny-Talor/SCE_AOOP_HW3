@@ -7,8 +7,10 @@ import java.util.concurrent.CyclicBarrier;
 public class AquaPanel extends JPanel {
 
 	static HashSet<Swimmable> sealife = new HashSet<>();
+	static HashSet<Immobile> plants = new HashSet<>();
+	
 	CyclicBarrier barrier;
-	boolean hasWorm = false;
+	public static Singleton wormInstance = null;
 
 	/**
 	 * Create the panel.
@@ -21,16 +23,27 @@ public class AquaPanel extends JPanel {
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
 		for (Swimmable animal : sealife) {
 			if (animal instanceof Fish) {
-				((Fish) animal).drawAnimal(g);
+				((Fish) animal).drawCreature(g);
 				new Thread(animal).start();
 			} else {
-				((Jellyfish) animal).drawAnimal(g);
+				((Jellyfish) animal).drawCreature(g);
 				new Thread(animal).start();
 			}
 		}
-		if(hasWorm == true) {
+		
+		for (Immobile plant : plants) {
+			if (plant instanceof Laminaria) {
+				((Laminaria) plant).drawCreature(g);
+			}
+			else {
+				((Zostera) plant).drawCreature(g);
+			}
+		}
+		
+		if(wormInstance != null) {
 			drawWorm(g);
 		}
 	}
@@ -57,13 +70,6 @@ public class AquaPanel extends JPanel {
 		}
 	}
 
-	public void setWorm() {
-		if (hasWorm == true)
-			hasWorm = false;
-		else
-			hasWorm = true;
-	}
-
 	public void drawWorm(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setColor(Color.PINK);
@@ -71,6 +77,13 @@ public class AquaPanel extends JPanel {
 		g2.drawArc(this.getWidth() / 2, this.getHeight() / 2 - 5, 10, 10, 30, 210);
 		g2.drawArc(this.getWidth() / 2, this.getHeight() / 2 + 5, 10, 10, 180, 270);
 		g2.setStroke(new BasicStroke(1));
+	}
+	
+	public void feedFish() {
+		if(AquaPanel.sealife.size() > 0) {
+			wormInstance = Singleton.getInstance();
+			repaint();
+		}
 	}
 
 	public void wormEatenBy(Swimmable obj) {
