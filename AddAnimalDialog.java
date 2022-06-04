@@ -5,13 +5,10 @@ import java.util.Random;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-@SuppressWarnings({ "unchecked", "rawtypes","serial" })
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class AddAnimalDialog extends JDialog {
 	private Random random = new Random();
 
-	enum FishColors {
-		BLACK, RED, BLUE, GREEN, CYAN, ORANGE, YELLOW, MAGENTA, PINK,
-	}
 	private final JPanel contentPanel = new JPanel();
 	private JComboBox animalType_cb;
 	private JTextField animalVerSpd_txtField;
@@ -23,6 +20,7 @@ public class AddAnimalDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public AddAnimalDialog() {
+		setTitle("Add animal");
 		setResizable(false);
 		setBounds(100, 100, 365, 239);
 		getContentPane().setLayout(new BorderLayout());
@@ -42,9 +40,9 @@ public class AddAnimalDialog extends JDialog {
 		contentPanel.add(animalVerSpd_txtField);
 		animalVerSpd_txtField.setColumns(10);
 
-		JLabel lbl4 = new JLabel("Vertical speed           pixels per millisecond");
+		JLabel lbl4 = new JLabel("Vertical speed:           pixels per millisecond");
 		lbl4.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lbl4.setBounds(20, 108, 330, 21);
+		lbl4.setBounds(10, 108, 330, 21);
 		contentPanel.add(lbl4);
 
 		animalHorSpd_txtField = new JTextField();
@@ -53,9 +51,9 @@ public class AddAnimalDialog extends JDialog {
 		contentPanel.add(animalHorSpd_txtField);
 		animalHorSpd_txtField.setColumns(10);
 
-		JLabel lbl3 = new JLabel("Horizotal speed             pixels per millisecond");
+		JLabel lbl3 = new JLabel("Horizotal speed:             pixels per millisecond");
 		lbl3.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lbl3.setBounds(20, 77, 340, 19);
+		lbl3.setBounds(10, 80, 340, 21);
 		contentPanel.add(lbl3);
 
 		animalSize_txtField = new JTextField();
@@ -64,7 +62,7 @@ public class AddAnimalDialog extends JDialog {
 		contentPanel.add(animalSize_txtField);
 		animalSize_txtField.setColumns(10);
 
-		JLabel lbl2 = new JLabel("Size                       pixels");
+		JLabel lbl2 = new JLabel("Size:                      pixels");
 		lbl2.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lbl2.setBounds(20, 48, 200, 18);
 		contentPanel.add(lbl2);
@@ -81,7 +79,7 @@ public class AddAnimalDialog extends JDialog {
 		lbl1.setBounds(10, 10, 110, 21);
 		contentPanel.add(lbl1);
 
-		JLabel lbl5 = new JLabel("Color");
+		JLabel lbl5 = new JLabel("Color:");
 		lbl5.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lbl5.setBounds(20, 139, 52, 21);
 		contentPanel.add(lbl5);
@@ -93,7 +91,6 @@ public class AddAnimalDialog extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						
 						try {
 							int size = Integer.parseInt(animalSize_txtField.getText());
 							int verSpd = Integer.parseInt(animalVerSpd_txtField.getText());
@@ -107,13 +104,14 @@ public class AddAnimalDialog extends JDialog {
 								throw new IllegalArgumentException();
 
 							Color c = colorByIndex(animalColor_cb.getSelectedIndex());
-
+							
+							AbstractSeaFactory factory = new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c);
 							if (animalType_cb.getSelectedIndex() == 0) {
-								Fish f = new Fish(size, x_pos, y_pos, horSpd, verSpd, c);
-								AquaPanel.sealife.add(f);
-							} else {
-								Jellyfish j = new Jellyfish(size, x_pos, y_pos, horSpd, verSpd, c);
-								AquaPanel.sealife.add(j);
+								SeaCreature obj = factory.produceSeaCreature("Fish");
+								AquaPanel.sealife.add((Swimmable)obj);
+							} else if(animalType_cb.getSelectedIndex() == 1){
+								SeaCreature obj = factory.produceSeaCreature("Jellyfish");
+								AquaPanel.sealife.add((Swimmable)obj);
 							}
 							AquaFrame.initializeTable();
 							AquaFrame.panel.repaint();
@@ -126,7 +124,6 @@ public class AddAnimalDialog extends JDialog {
 						} catch (IllegalArgumentException ex) {
 							JOptionPane.showMessageDialog(null, "Speed must be between 1 to 10!");
 						}
-						
 					}
 				});
 				okButton.setActionCommand("OK");

@@ -20,6 +20,7 @@ public class AquaFrame extends JFrame {
 	};
 
 	static JButton btnAddAnimal;
+	static JButton btnAddPlant;
 	static JButton btnFood;
 
 	/**
@@ -43,43 +44,77 @@ public class AquaFrame extends JFrame {
 	 */
 	public AquaFrame() {
 		//
-		// AquaFrame
+		// AquaFrame properties
 		//
 		setResizable(false);
 		setTitle("HW3");
-		setBounds(100, 100, 800, 600);
+		setBounds(100, 100, 844, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//
+		// AquaPanel properties
+		//
 		panel.setOpaque(false);
 		panel.setLocation(0, 0);
-		panel.setSize(786, 541);
+		panel.setSize(830, 541);
 		panel.setRequestFocusEnabled(false);
 		panel.setLayout(null);
 
+		// HorizontalBox Properties
 		horizontalBox.setAlignmentY(Component.CENTER_ALIGNMENT);
 		horizontalBox.setBorder(null);
 		horizontalBox.setForeground(SystemColor.menuText);
 		horizontalBox.setBackground(SystemColor.info);
-
-		horizontalBox.setBounds(0, 497, 786, 44);
+		horizontalBox.setBounds(0, 512, 829, 29);
 		panel.add(horizontalBox);
 
+		//
+		// HorizontalBox left glue
+		//
 		Component horizontalGlue = Box.createHorizontalGlue();
 		horizontalBox.add(horizontalGlue);
 
+		//
+		// AddAnimal button
+		//
 		btnAddAnimal = new JButton("Add Animal");
 		btnAddAnimal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddAnimalDialog addAnimalDialog = new AddAnimalDialog();
-				addAnimalDialog.setVisible(true);
-				addAnimalDialog.setAlwaysOnTop(true);
-				btnAddAnimal.setEnabled(false);
+				if (AquaPanel.sealife.size() == 5) {
+					JOptionPane.showMessageDialog(null, "Aquarium can not contain more than 5 fish or jellyfish!");
+				} else {
+					AddAnimalDialog addAnimalDialog = new AddAnimalDialog();
+					addAnimalDialog.setVisible(true);
+					addAnimalDialog.setAlwaysOnTop(true);
+					btnAddAnimal.setEnabled(false);
+				}
 			}
 		});
 		btnAddAnimal.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnAddAnimal);
 
+		//
+		// AddPlant button
+		//
+		btnAddPlant = new JButton("Add Plant");
+		btnAddPlant.setFont(new Font("Arial", Font.BOLD, 17));
+		btnAddPlant.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (AquaPanel.plants.size() == 5) {
+					JOptionPane.showMessageDialog(null, "Aquarium can not contain more than 5 plants!");
+				} else {
+					AddPlantDialog addPlantDialog = new AddPlantDialog();
+					addPlantDialog.setVisible(true);
+					addPlantDialog.setAlwaysOnTop(true);
+					btnAddPlant.setEnabled(false);
+				}
+			}
+		});
+		horizontalBox.add(btnAddPlant);
+
+		//
+		// Sleep button
+		//
 		JButton btnSleep = new JButton("Sleep");
 		btnSleep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -89,6 +124,9 @@ public class AquaFrame extends JFrame {
 		btnSleep.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnSleep);
 
+		//
+		// Wake up button
+		//
 		JButton btnWakeUp = new JButton("Wake up");
 		btnWakeUp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -98,9 +136,13 @@ public class AquaFrame extends JFrame {
 		btnWakeUp.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnWakeUp);
 
+		//
+		// Reset button
+		//
 		JButton btnReset = new JButton("Reset");
 		btnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				AquaPanel.plants.clear();
 				AquaPanel.sealife.clear();
 				tableModel.setRowCount(0);
 				panel.repaint();
@@ -109,25 +151,21 @@ public class AquaFrame extends JFrame {
 		btnReset.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnReset);
 
+		//
+		// Food button
+		//
 		btnFood = new JButton("Food");
 		btnFood.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (!panel.hasWorm && AquaPanel.sealife.size() > 0) {
-					try {
-						panel.createBarrier();
-						panel.setWorm();
-						panel.repaint();
-						btnFood.setEnabled(false);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-
-				}
+				panel.feedFish();
 			}
 		});
 		btnFood.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnFood);
 
+		//
+		// Info button (table with creatures)
+		//
 		JButton btnInfo = new JButton("Info");
 		btnInfo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -140,10 +178,12 @@ public class AquaFrame extends JFrame {
 
 			}
 		});
-
 		btnInfo.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnInfo);
 
+		//
+		// Exit button
+		//
 		JButton btnNewButton = new JButton("Exit");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -153,28 +193,36 @@ public class AquaFrame extends JFrame {
 		btnNewButton.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnNewButton);
 
+		//
+		// HorizontalBox right glue
+		//
 		Component horizontalGlue_1 = Box.createHorizontalGlue();
 		horizontalBox.add(horizontalGlue_1);
 
+		//
+		// Scrollpane properties (to hold info table)
+		//
 		scrollPane.setEnabled(false);
 		scrollPane.setLocation(0, 0);
-		scrollPane.setSize(786, 500);
+		scrollPane.setSize(830, 500);
 		scrollPane.setAutoscrolls(true);
 		scrollPane.setFocusable(false);
 		scrollPane.setVisible(false);
 
+		//
+		// Table constructor
+		//
 		tableModel = new DefaultTableModel(tableHeaders, 0);
 		table.setModel(tableModel);
+		scrollPane.setViewportView(table); // add table to scrollpane
 
-		scrollPane.setViewportView(table);
+		getContentPane().add(layeredPane, BorderLayout.CENTER); // add a layered pane containing all panels
 
-		getContentPane().add(layeredPane, BorderLayout.CENTER);
-
+		// layered pane layers:
 		// layer 0 - color panel
 		// layer 1 - image panel
 		// layer 2 - fish panel
 		// layer 3 - scrollpane(table)
-
 		layeredPane.add(panel);
 		layeredPane.setLayer(panel, 2);
 		layeredPane.add(scrollPane);
@@ -187,22 +235,31 @@ public class AquaFrame extends JFrame {
 				g.drawImage(i, 0, 0, this.getSize().width, this.getSize().height, this);
 			}
 		};
-		imagePanel.setBounds(0, 0, 786, 541);
+		imagePanel.setBounds(0, 0, 830, 541);
 		layeredPane.add(imagePanel);
 		layeredPane.setLayer(imagePanel, 1);
 		imagePanel.setVisible(false);
 
 		JPanel colorPanel = new JPanel();
-		colorPanel.setBounds(0, 0, 786, 541);
+		colorPanel.setBounds(0, 0, 830, 541);
 		layeredPane.add(colorPanel);
 		layeredPane.setLayer(colorPanel, 0);
 
+		//
+		// Menu bar
+		//
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
+		//
+		// Menu bar file button
+		//
 		JMenu mnMain = new JMenu("File");
 		menuBar.add(mnMain);
 
+		//
+		// Menu bar exit button
+		//
 		JMenuItem file_Exit = new JMenuItem("Exit");
 		file_Exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -211,9 +268,15 @@ public class AquaFrame extends JFrame {
 		});
 		mnMain.add(file_Exit);
 
+		//
+		// Menu bar background button
+		//
 		JMenu mnBackground = new JMenu("Background");
 		menuBar.add(mnBackground);
 
+		//
+		// Menu bar > background > image button
+		//
 		JMenuItem bg_Image = new JMenuItem("Image");
 		bg_Image.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -223,6 +286,9 @@ public class AquaFrame extends JFrame {
 		});
 		mnBackground.add(bg_Image);
 
+		//
+		// Menu bar > background > none button
+		//
 		JMenuItem bg_None = new JMenuItem("None");
 		bg_None.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -232,6 +298,9 @@ public class AquaFrame extends JFrame {
 			}
 		});
 
+		//
+		// Menu bar > background > blue button
+		//
 		JMenuItem bg_Blue = new JMenuItem("Blue");
 		bg_Blue.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -243,9 +312,15 @@ public class AquaFrame extends JFrame {
 		mnBackground.add(bg_Blue);
 		mnBackground.add(bg_None);
 
+		//
+		// Menu bar help button
+		//
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 
+		//
+		// Menu bar about button
+		//
 		JMenuItem help_About = new JMenuItem("About");
 		help_About.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -256,6 +331,9 @@ public class AquaFrame extends JFrame {
 		mnHelp.add(help_About);
 	}
 
+	/**
+	 * Adds fish and jellyfish information to the table.
+	 */
 	public static void initializeTable() {
 		AquaFrame.tableModel.setRowCount(0);
 		for (Swimmable animal : AquaPanel.sealife) {

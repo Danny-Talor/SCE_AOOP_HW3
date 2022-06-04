@@ -1,7 +1,7 @@
 import java.awt.Graphics;
 import java.util.concurrent.CyclicBarrier;
 
-public abstract class Swimmable extends Thread {
+public abstract class Swimmable extends Thread implements SeaCreature{
 	protected int horSpeed;
 	protected int verSpeed;
 
@@ -33,7 +33,7 @@ public abstract class Swimmable extends Thread {
 
 	abstract public String getAnimalName();
 
-	abstract public void drawAnimal(Graphics g);
+	abstract public void drawCreature(Graphics g);
 
 	abstract public void setSuspend();
 
