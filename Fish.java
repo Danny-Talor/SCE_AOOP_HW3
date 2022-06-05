@@ -194,8 +194,8 @@ public class Fish extends Swimmable{
 	public void run() {
 
 		try {
-			Thread.sleep(60);
-			if (isSuspended) { // if the user press on sleep button
+			Thread.sleep(100); // slow the fish down
+			if (isSuspended) {
 				if (AquaPanel.wormInstance != null) {
 					if (barrier != null)
 						barrier.await();
@@ -204,10 +204,10 @@ public class Fish extends Swimmable{
 					}
 				}
 			} else {
-				if (AquaPanel.wormInstance != null)
-					eatWorm();
-				else
+				if (AquaPanel.wormInstance == null)
 					move();
+				else
+					eatWorm();
 			}
 
 		} catch (InterruptedException e) {
@@ -222,17 +222,16 @@ public class Fish extends Swimmable{
 
 	public void move() {
 
-		if (x_front > AquaFrame.panel.getWidth())
-			x_dir = -1;
-		if (y_front > AquaFrame.panel.getHeight())
-			y_dir = -1;
-		if (x_front < 0)
-			x_dir = 1;
-		if (y_front < 0)
-			y_dir = 1;
-
 		this.x_front += horSpeed * x_dir;
 		this.y_front += verSpeed * y_dir;
+		if (x_front >= AquaFrame.panel.getWidth())
+			x_dir = -1;
+		if (y_front >= AquaFrame.panel.getHeight())
+			y_dir = -1;
+		if (x_front <= 0)
+			x_dir = 1;
+		if (y_front <= 0)
+			y_dir = 1;
 	}
 
 	public void eatWorm() {
@@ -245,15 +244,17 @@ public class Fish extends Swimmable{
 				e.printStackTrace();
 			}
 		}
-		barrier = null;
 
+		//Calculate path to worm
 		double v_old = Math.sqrt(horSpeed * horSpeed + verSpeed * verSpeed);
 		double k = (Math.abs((double) y_front - (double) (AquaFrame.panel.getHeight()) / 2)
 				/ Math.abs((double) x_front - (double) (AquaFrame.panel.getWidth()) / 2));
 		double newHorSpeed = v_old / Math.sqrt(k * k + 1);
 		double newVerSpeed = newHorSpeed * k;
 
-		if (x_front >= AquaFrame.panel.getWidth() / 2 || x_front < 0)
+		x_front += newHorSpeed * x_dir;
+		y_front += newVerSpeed * y_dir;
+		if (x_front >= AquaFrame.panel.getWidth() / 2)
 			x_dir = -1;
 		else
 			x_dir = 1;
@@ -261,13 +262,11 @@ public class Fish extends Swimmable{
 			y_dir = -1;
 		else
 			y_dir = 1;
-		x_front += newHorSpeed * x_dir;
-		y_front += newVerSpeed * y_dir;
+		
 		synchronized (this) {
 			// If fish is 5 pixels away from the worm
 			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5)
 					&& (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
-
 				AquaFrame.panel.wormEatenBy(this);
 				Singleton.set();
 				AquaPanel.wormInstance = null;

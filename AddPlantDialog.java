@@ -18,6 +18,10 @@ public class AddPlantDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public AddPlantDialog() {
+		
+		JFrame frame = new JFrame(); //Send to JOptionPane constructor to
+		frame.setAlwaysOnTop(true);  //make sure error dialogs are always on top
+		
 		setTitle("Add plant");
 		setResizable(false);
 		setBounds(100, 100, 365, 239);
@@ -76,9 +80,9 @@ public class AddPlantDialog extends JDialog {
 							AquaFrame.btnAddPlant.setEnabled(true);
 							dispose();
 						} catch (NumberFormatException ex) {
-							JOptionPane.showMessageDialog(null, "Field must contain numbers!");
+							JOptionPane.showMessageDialog(frame, "Field must contain numbers!");
 						} catch (IllegalStateException ex) {
-							JOptionPane.showMessageDialog(null, "Size must be between 20 to 320!");
+							JOptionPane.showMessageDialog(frame, "Size must be between 20 to 320!");
 						}
 					}
 				});
@@ -90,7 +94,7 @@ public class AddPlantDialog extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						AquaFrame.btnAddAnimal.setEnabled(true);
+						AquaFrame.btnAddPlant.setEnabled(true);
 						dispose();
 					}
 				});

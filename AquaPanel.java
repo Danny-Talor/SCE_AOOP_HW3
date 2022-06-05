@@ -79,7 +79,7 @@ public class AquaPanel extends JPanel {
 		g2.setStroke(new BasicStroke(1));
 	}
 	
-	public void feedFish() {
+	public void drawWorm() {
 		if(AquaPanel.sealife.size() > 0) {
 			wormInstance = Singleton.getInstance();
 			repaint();
@@ -92,7 +92,7 @@ public class AquaPanel extends JPanel {
 	}
 	
 	public void createBarrier() {
-		if(sealife.size()>0) {
+		if(sealife.size()>1) {
 			barrier = new CyclicBarrier(sealife.size());
 			for(Swimmable animal:sealife) {
 				animal.setBarrier(barrier);

@@ -20,6 +20,7 @@ public class AquaFrame extends JFrame {
 	};
 
 	static JButton btnAddAnimal;
+	static JButton btnDupeAnimal;
 	static JButton btnAddPlant;
 	static JButton btnFood;
 
@@ -43,12 +44,18 @@ public class AquaFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public AquaFrame() {
+		
+		
+		JFrame frame = new JFrame(); //Send to JOptionPane constructor to
+		frame.setAlwaysOnTop(true);  //make sure error dialogs are always on top
+		
+		
 		//
 		// AquaFrame properties
 		//
 		setResizable(false);
 		setTitle("HW3");
-		setBounds(100, 100, 844, 600);
+		setBounds(100, 100, 950, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//
@@ -56,7 +63,7 @@ public class AquaFrame extends JFrame {
 		//
 		panel.setOpaque(false);
 		panel.setLocation(0, 0);
-		panel.setSize(830, 541);
+		panel.setSize(936, 541);
 		panel.setRequestFocusEnabled(false);
 		panel.setLayout(null);
 
@@ -65,7 +72,7 @@ public class AquaFrame extends JFrame {
 		horizontalBox.setBorder(null);
 		horizontalBox.setForeground(SystemColor.menuText);
 		horizontalBox.setBackground(SystemColor.info);
-		horizontalBox.setBounds(0, 512, 829, 29);
+		horizontalBox.setBounds(0, 512, 936, 29);
 		panel.add(horizontalBox);
 
 		//
@@ -81,7 +88,7 @@ public class AquaFrame extends JFrame {
 		btnAddAnimal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (AquaPanel.sealife.size() == 5) {
-					JOptionPane.showMessageDialog(null, "Aquarium can not contain more than 5 fish or jellyfish!");
+					JOptionPane.showMessageDialog(frame, "Aquarium can not contain more than 5 fish or jellyfish!");
 				} else {
 					AddAnimalDialog addAnimalDialog = new AddAnimalDialog();
 					addAnimalDialog.setVisible(true);
@@ -101,7 +108,7 @@ public class AquaFrame extends JFrame {
 		btnAddPlant.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (AquaPanel.plants.size() == 5) {
-					JOptionPane.showMessageDialog(null, "Aquarium can not contain more than 5 plants!");
+					JOptionPane.showMessageDialog(frame, "Aquarium can not contain more than 5 plants!");
 				} else {
 					AddPlantDialog addPlantDialog = new AddPlantDialog();
 					addPlantDialog.setVisible(true);
@@ -110,6 +117,29 @@ public class AquaFrame extends JFrame {
 				}
 			}
 		});
+
+		//
+		// Duplicate animal button
+		//
+		btnDupeAnimal = new JButton("Duplicate Animal");
+		btnDupeAnimal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (AquaPanel.sealife.size() == 5)
+					JOptionPane.showMessageDialog(frame,
+							"Can not duplicate: Aquarium can not contain more than 5 fish or jellyfish!");
+				else if (AquaPanel.sealife.size() == 0)
+					JOptionPane.showMessageDialog(frame,
+							"Can not duplicate: Aquarium does not contain any fish or jellyfish!");
+				else {
+					DupeAnimalDialog dupeAnimalDialog = new DupeAnimalDialog();
+					dupeAnimalDialog.setVisible(true);
+					dupeAnimalDialog.setAlwaysOnTop(true);
+					btnDupeAnimal.setEnabled(false);
+				}
+			}
+		});
+		btnDupeAnimal.setFont(new Font("Arial", Font.BOLD, 17));
+		horizontalBox.add(btnDupeAnimal);
 		horizontalBox.add(btnAddPlant);
 
 		//
@@ -157,7 +187,8 @@ public class AquaFrame extends JFrame {
 		btnFood = new JButton("Food");
 		btnFood.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel.feedFish();
+				panel.drawWorm();
+				panel.createBarrier();
 			}
 		});
 		btnFood.setFont(new Font("Arial", Font.BOLD, 17));
@@ -204,7 +235,7 @@ public class AquaFrame extends JFrame {
 		//
 		scrollPane.setEnabled(false);
 		scrollPane.setLocation(0, 0);
-		scrollPane.setSize(830, 500);
+		scrollPane.setSize(936, 500);
 		scrollPane.setAutoscrolls(true);
 		scrollPane.setFocusable(false);
 		scrollPane.setVisible(false);
@@ -235,13 +266,13 @@ public class AquaFrame extends JFrame {
 				g.drawImage(i, 0, 0, this.getSize().width, this.getSize().height, this);
 			}
 		};
-		imagePanel.setBounds(0, 0, 830, 541);
+		imagePanel.setBounds(0, 0, 936, 541);
 		layeredPane.add(imagePanel);
 		layeredPane.setLayer(imagePanel, 1);
 		imagePanel.setVisible(false);
 
 		JPanel colorPanel = new JPanel();
-		colorPanel.setBounds(0, 0, 830, 541);
+		colorPanel.setBounds(0, 0, 936, 541);
 		layeredPane.add(colorPanel);
 		layeredPane.setLayer(colorPanel, 0);
 
@@ -324,7 +355,7 @@ public class AquaFrame extends JFrame {
 		JMenuItem help_About = new JMenuItem("About");
 		help_About.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "Home Work 3\nGUI @ Threads");
+				JOptionPane.showMessageDialog(frame, "Home Work 3\nGUI @ Threads");
 
 			}
 		});

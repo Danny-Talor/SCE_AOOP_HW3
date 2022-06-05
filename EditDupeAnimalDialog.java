@@ -6,11 +6,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class AddAnimalDialog extends JDialog {
+public class EditDupeAnimalDialog extends JDialog {
 	private Random random = new Random();
 
 	private final JPanel contentPanel = new JPanel();
-	private JComboBox animalType_cb;
 	private JTextField animalVerSpd_txtField;
 	private JTextField animalHorSpd_txtField;
 	private JTextField animalSize_txtField;
@@ -19,12 +18,12 @@ public class AddAnimalDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public AddAnimalDialog() {
-		
-		JFrame frame = new JFrame(); //Send to JOptionPane constructor to
-		frame.setAlwaysOnTop(true);  //make sure error dialogs are always on top
-		
-		setTitle("Add animal");
+	public EditDupeAnimalDialog(Swimmable animal) {
+
+		JFrame frame = new JFrame(); // Send to JOptionPane constructor to
+		frame.setAlwaysOnTop(true); // make sure error dialogs are always on top
+
+		setTitle("Edit before duplication");
 		setResizable(false);
 		setBounds(100, 100, 365, 239);
 		getContentPane().setLayout(new BorderLayout());
@@ -32,13 +31,8 @@ public class AddAnimalDialog extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 
-		animalType_cb = new JComboBox();
-		animalType_cb.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		animalType_cb.setModel(new DefaultComboBoxModel(new String[] { "Fish", "Jellyfish" }));
-		animalType_cb.setBounds(110, 12, 125, 21);
-		contentPanel.add(animalType_cb);
-
 		animalVerSpd_txtField = new JTextField();
+		animalVerSpd_txtField.setText(String.valueOf(animal.getVerSpeed()));
 		animalVerSpd_txtField.setToolTipText("1-10 px/ms");
 		animalVerSpd_txtField.setBounds(122, 111, 46, 19);
 		contentPanel.add(animalVerSpd_txtField);
@@ -50,6 +44,7 @@ public class AddAnimalDialog extends JDialog {
 		contentPanel.add(lbl4);
 
 		animalHorSpd_txtField = new JTextField();
+		animalHorSpd_txtField.setText(String.valueOf(animal.getHorSpeed()));
 		animalHorSpd_txtField.setToolTipText("1-10 px/ms");
 		animalHorSpd_txtField.setBounds(135, 79, 52, 19);
 		contentPanel.add(animalHorSpd_txtField);
@@ -61,6 +56,7 @@ public class AddAnimalDialog extends JDialog {
 		contentPanel.add(lbl3);
 
 		animalSize_txtField = new JTextField();
+		animalSize_txtField.setText(String.valueOf(animal.getSize()));
 		animalSize_txtField.setToolTipText("20-320 pixels");
 		animalSize_txtField.setBounds(61, 50, 96, 19);
 		contentPanel.add(animalSize_txtField);
@@ -78,10 +74,10 @@ public class AddAnimalDialog extends JDialog {
 		animalColor_cb.setBounds(61, 140, 96, 21);
 		contentPanel.add(animalColor_cb);
 
-		JLabel lbl1 = new JLabel("Animal type:");
-		lbl1.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lbl1.setBounds(10, 10, 110, 21);
-		contentPanel.add(lbl1);
+		JLabel typeLbl = new JLabel("Duplicating " + animal.getAnimalName());
+		typeLbl.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		typeLbl.setBounds(10, 10, 330, 21);
+		contentPanel.add(typeLbl);
 
 		JLabel lbl5 = new JLabel("Color:");
 		lbl5.setFont(new Font("Tahoma", Font.PLAIN, 16));
@@ -92,7 +88,7 @@ public class AddAnimalDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
+				JButton okButton = new JButton("Duplicate");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						try {
@@ -108,18 +104,13 @@ public class AddAnimalDialog extends JDialog {
 								throw new IllegalArgumentException();
 
 							Color c = colorByIndex(animalColor_cb.getSelectedIndex());
-							
+
 							AbstractSeaFactory factory = new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c);
-							if (animalType_cb.getSelectedIndex() == 0) {
-								SeaCreature obj = factory.produceSeaCreature("Fish");
-								AquaPanel.sealife.add((Swimmable)obj);
-							} else if(animalType_cb.getSelectedIndex() == 1){
-								SeaCreature obj = factory.produceSeaCreature("Jellyfish");
-								AquaPanel.sealife.add((Swimmable)obj);
-							}
+							SeaCreature obj = factory.produceSeaCreature(animal.getAnimalName());
+							AquaPanel.sealife.add((Swimmable) obj);
 							AquaFrame.initializeTable();
 							AquaFrame.panel.repaint();
-							AquaFrame.btnAddAnimal.setEnabled(true);
+							AquaFrame.btnDupeAnimal.setEnabled(true);
 							dispose();
 						} catch (NumberFormatException ex) {
 							JOptionPane.showMessageDialog(frame, "Fields must contain numbers!");
@@ -138,7 +129,7 @@ public class AddAnimalDialog extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						AquaFrame.btnAddAnimal.setEnabled(true);
+						AquaFrame.btnDupeAnimal.setEnabled(true);
 						dispose();
 					}
 				});

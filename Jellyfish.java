@@ -1,8 +1,7 @@
 import java.awt.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.*;
 
-public class Jellyfish extends Swimmable {
+public class Jellyfish extends Swimmable{
 	private int EAT_DISTANCE = 4;
 	private int size;
 	private Color col;
@@ -13,11 +12,11 @@ public class Jellyfish extends Swimmable {
 
 	public Jellyfish() {
 		super();
-		this.size = 0;
-		this.col = new Color(0, 0, 0);
-		this.eatCount = 0;
+		this.size = 20;
+		this.col = new Color(30, 60, 70);
 		this.x_front = 0;
 		this.y_front = 0;
+		this.eatCount = 0;
 		this.x_dir = 1;
 		this.y_dir = 1;
 	}
@@ -94,16 +93,14 @@ public class Jellyfish extends Swimmable {
 	}
 
 	/**
-	 * @return int with the number of time the Jellyfish ate before he chage his
-	 *         size
-	 * @see eatInc
+	 * @return int with the number of time the Jellyfish ate before he chage his size
 	 */
 	public int getEatCount() {
 		return this.eatCount;
 	}
 
 	/**
-	 * @return String whith the color of the Jellyfish
+	 * @return String with the color of the Jellyfish
 	 */
 	public String getColor() {
 		String rgb = String.valueOf(this.col.getRed()) + "," + String.valueOf(this.col.getGreen()) + ","
@@ -159,8 +156,8 @@ public class Jellyfish extends Swimmable {
 	public void run() {
 
 		try {
-			Thread.sleep(60);
-			if (isSuspended) { // if the user press on sleep button
+			Thread.sleep(200); // slow the jellyfish down
+			if (isSuspended) {
 				if (AquaPanel.wormInstance != null) {
 					if (barrier != null)
 						barrier.await();
@@ -169,10 +166,10 @@ public class Jellyfish extends Swimmable {
 					}
 				}
 			} else {
-				if (AquaPanel.wormInstance != null)
-					eatWorm();
-				else
+				if (AquaPanel.wormInstance == null)
 					move();
+				else
+					eatWorm();
 			}
 
 		} catch (InterruptedException e) {
@@ -184,63 +181,61 @@ public class Jellyfish extends Swimmable {
 
 		AquaFrame.panel.repaint();
 	}
-	
-public void move() {
-		
-		if(x_front > AquaFrame.panel.getWidth())
-		    x_dir = -1;
-		if(y_front > AquaFrame.panel.getHeight())
-		    y_dir = -1;
-		if(x_front <0)
-		    x_dir = 1;
-		if(y_front <0)
-		    y_dir = 1;
-		
-		this.x_front+=horSpeed*x_dir;
-		this.y_front+=verSpeed*y_dir;
+
+	public void move() {
+
+		this.x_front += horSpeed * x_dir;
+		this.y_front += verSpeed * y_dir;
+		if (x_front >= AquaFrame.panel.getWidth())
+			x_dir = -1;
+		if (y_front >= AquaFrame.panel.getHeight())
+			y_dir = -1;
+		if (x_front <= 0)
+			x_dir = 1;
+		if (y_front <= 0)
+			y_dir = 1;
 	}
 
 	public void eatWorm() {
 		if (barrier != null) {
 			try {
 				barrier.await();
-
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (BrokenBarrierException e) {
 				e.printStackTrace();
 			}
-
 		}
-	    barrier = null;
 
+		//Calculate path to worm
 		double v_old = Math.sqrt(horSpeed * horSpeed + verSpeed * verSpeed);
 		double k = (Math.abs((double) y_front - (double) (AquaFrame.panel.getHeight()) / 2)
 				/ Math.abs((double) x_front - (double) (AquaFrame.panel.getWidth()) / 2));
 		double newHorSpeed = v_old / Math.sqrt(k * k + 1);
 		double newVerSpeed = newHorSpeed * k;
 
-		if (x_front >= AquaFrame.panel.getWidth() / 2 || x_front < 0)
-			x_dir = - 1;
+		x_front += newHorSpeed * x_dir;
+		y_front += newVerSpeed * y_dir;
+		if (x_front >= AquaFrame.panel.getWidth() / 2)
+			x_dir = -1;
 		else
 			x_dir = 1;
 		if (y_front > AquaFrame.panel.getHeight() / 2)
 			y_dir = -1;
 		else
 			y_dir = 1;
-		x_front += newHorSpeed * x_dir;
-		y_front += newVerSpeed * y_dir;
-
+		
 		synchronized (this) {
 			// If fish is 5 pixels away from the worm
-			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5) && (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
+			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5)
+					&& (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
 				AquaFrame.panel.wormEatenBy(this);
 				Singleton.set();
+				AquaPanel.wormInstance = null;
 				AquaFrame.btnFood.setEnabled(true);
 				AquaFrame.panel.repaint();
 				AquaFrame.initializeTable();
 			}
 		}
 	}
-
 }
