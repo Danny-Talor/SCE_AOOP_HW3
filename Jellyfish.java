@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.util.concurrent.*;
 
-public class Jellyfish extends Swimmable{
+public class Jellyfish extends Swimmable {
 	private int EAT_DISTANCE = 4;
 	private int size;
 	private Color col;
@@ -9,17 +9,6 @@ public class Jellyfish extends Swimmable{
 	private int x_front, y_front, x_dir, y_dir;
 	private boolean isSuspended = false;
 	private CyclicBarrier barrier = null;
-
-	public Jellyfish() {
-		super();
-		this.size = 20;
-		this.col = new Color(30, 60, 70);
-		this.x_front = 0;
-		this.y_front = 0;
-		this.eatCount = 0;
-		this.x_dir = 1;
-		this.y_dir = 1;
-	}
 
 	/**
 	 * Creates a new Jellyfish
@@ -93,7 +82,8 @@ public class Jellyfish extends Swimmable{
 	}
 
 	/**
-	 * @return int with the number of time the Jellyfish ate before he chage his size
+	 * @return int with the number of time the Jellyfish ate before he chage his
+	 *         size
 	 */
 	public int getEatCount() {
 		return this.eatCount;
@@ -102,7 +92,7 @@ public class Jellyfish extends Swimmable{
 	/**
 	 * @return String with the color of the Jellyfish
 	 */
-	public String getColor() {
+	public String getColorName() {
 		String rgb = String.valueOf(this.col.getRed()) + "," + String.valueOf(this.col.getGreen()) + ","
 				+ String.valueOf(this.col.getBlue());
 		if (rgb.equals("255,0,0"))
@@ -123,6 +113,16 @@ public class Jellyfish extends Swimmable{
 			return "Pink";
 		else
 			return rgb;
+	}
+	
+	@Override
+	public Color getColor() {
+		return this.col;
+	}
+	
+	@Override
+	public void setColor(Color c) {
+		this.col = c;
 	}
 
 	/**
@@ -158,20 +158,13 @@ public class Jellyfish extends Swimmable{
 		try {
 			Thread.sleep(200); // slow the jellyfish down
 			if (isSuspended) {
-				if (AquaPanel.wormInstance != null) {
-					if (barrier != null)
-						barrier.await();
-					synchronized (this) {
-						wait();
-					}
+				if (barrier != null)
+					barrier.await();
+				synchronized (this) {
+					wait();
 				}
-			} else {
-				if (AquaPanel.wormInstance == null)
-					move();
-				else
-					eatWorm();
-			}
-
+			} else
+				move();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			return;
@@ -183,7 +176,6 @@ public class Jellyfish extends Swimmable{
 	}
 
 	public void move() {
-
 		this.x_front += horSpeed * x_dir;
 		this.y_front += verSpeed * y_dir;
 		if (x_front >= AquaFrame.panel.getWidth())
@@ -194,48 +186,20 @@ public class Jellyfish extends Swimmable{
 			x_dir = 1;
 		if (y_front <= 0)
 			y_dir = 1;
+
+		synchronized (this) {
+		if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 50) && (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 50) && (AquaPanel.wormInstance != null)) {
+			AquaFrame.panel.wormEatenBy(this);
+			Singleton.set();
+			AquaPanel.wormInstance = null;
+			AquaFrame.btnFood.setEnabled(true);
+			AquaFrame.panel.repaint();
+			AquaFrame.updateJTable();
+		}
+		}
 	}
 
-	public void eatWorm() {
-		if (barrier != null) {
-			try {
-				barrier.await();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (BrokenBarrierException e) {
-				e.printStackTrace();
-			}
-		}
-
-		//Calculate path to worm
-		double v_old = Math.sqrt(horSpeed * horSpeed + verSpeed * verSpeed);
-		double k = (Math.abs((double) y_front - (double) (AquaFrame.panel.getHeight()) / 2)
-				/ Math.abs((double) x_front - (double) (AquaFrame.panel.getWidth()) / 2));
-		double newHorSpeed = v_old / Math.sqrt(k * k + 1);
-		double newVerSpeed = newHorSpeed * k;
-
-		x_front += newHorSpeed * x_dir;
-		y_front += newVerSpeed * y_dir;
-		if (x_front >= AquaFrame.panel.getWidth() / 2)
-			x_dir = -1;
-		else
-			x_dir = 1;
-		if (y_front > AquaFrame.panel.getHeight() / 2)
-			y_dir = -1;
-		else
-			y_dir = 1;
-		
-		synchronized (this) {
-			// If fish is 5 pixels away from the worm
-			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5)
-					&& (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
-				AquaFrame.panel.wormEatenBy(this);
-				Singleton.set();
-				AquaPanel.wormInstance = null;
-				AquaFrame.btnFood.setEnabled(true);
-				AquaFrame.panel.repaint();
-				AquaFrame.initializeTable();
-			}
-		}
+	public int getHungerFreq() {
+		return -1;
 	}
 }

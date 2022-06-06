@@ -15,6 +15,8 @@ public class AddAnimalDialog extends JDialog {
 	private JTextField animalHorSpd_txtField;
 	private JTextField animalSize_txtField;
 	private JComboBox animalColor_cb;
+	private JLabel hunglbl;
+	private JTextField textField;
 
 	/**
 	 * Create the dialog.
@@ -26,13 +28,27 @@ public class AddAnimalDialog extends JDialog {
 		
 		setTitle("Add animal");
 		setResizable(false);
-		setBounds(100, 100, 365, 239);
+		setBounds(100, 100, 373, 272);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 
 		animalType_cb = new JComboBox();
+		animalType_cb.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if(animalType_cb.getSelectedIndex() == 1) {
+					hunglbl.setVisible(false);
+					textField.setVisible(false);
+					textField.setText("-1");
+				}
+				else {
+					hunglbl.setVisible(true);
+					textField.setVisible(true);
+					textField.setText("");
+				}
+			}
+		});
 		animalType_cb.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		animalType_cb.setModel(new DefaultComboBoxModel(new String[] { "Fish", "Jellyfish" }));
 		animalType_cb.setBounds(110, 12, 125, 21);
@@ -75,7 +91,7 @@ public class AddAnimalDialog extends JDialog {
 		animalColor_cb.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		animalColor_cb.setModel(new DefaultComboBoxModel(
 				new String[] { "Red", "Blue", "Green", "Cyan", "Orange", "Yellow", "Magenta", "Pink", "Black" }));
-		animalColor_cb.setBounds(61, 140, 96, 21);
+		animalColor_cb.setBounds(51, 141, 96, 21);
 		contentPanel.add(animalColor_cb);
 
 		JLabel lbl1 = new JLabel("Animal type:");
@@ -85,8 +101,19 @@ public class AddAnimalDialog extends JDialog {
 
 		JLabel lbl5 = new JLabel("Color:");
 		lbl5.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lbl5.setBounds(20, 139, 52, 21);
+		lbl5.setBounds(10, 140, 52, 21);
 		contentPanel.add(lbl5);
+		
+		hunglbl = new JLabel("Hunger frequency:            moves");
+		hunglbl.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		hunglbl.setBounds(10, 172, 330, 21);
+		contentPanel.add(hunglbl);
+		
+		textField = new JTextField();
+		textField.setToolTipText("8 - 24 moves");
+		textField.setColumns(10);
+		textField.setBounds(150, 175, 46, 19);
+		contentPanel.add(textField);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -101,25 +128,29 @@ public class AddAnimalDialog extends JDialog {
 							int horSpd = Integer.parseInt(animalHorSpd_txtField.getText());
 							int x_pos = random.nextInt(AquaFrame.panel.getWidth());
 							int y_pos = random.nextInt(AquaFrame.panel.getHeight());
-
+							int hungerFreq = Integer.parseInt(textField.getText());	
+							
 							if (size < 20 || size > 320)
 								throw new IllegalStateException();
 							if (verSpd < 1 || verSpd > 10 || horSpd < 1 || horSpd > 10)
 								throw new IllegalArgumentException();
+							if((hungerFreq < 8 || hungerFreq > 24 ) && animalType_cb.getSelectedIndex() == 0)
+								throw new ArithmeticException();
 
 							Color c = colorByIndex(animalColor_cb.getSelectedIndex());
 							
-							AbstractSeaFactory factory = new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c);
+							AbstractSeaFactory factory = new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c, hungerFreq);
 							if (animalType_cb.getSelectedIndex() == 0) {
 								SeaCreature obj = factory.produceSeaCreature("Fish");
 								AquaPanel.sealife.add((Swimmable)obj);
+								((Fish)obj).addPropertyChangeListener(AquaFrame.panel);
 							} else if(animalType_cb.getSelectedIndex() == 1){
 								SeaCreature obj = factory.produceSeaCreature("Jellyfish");
 								AquaPanel.sealife.add((Swimmable)obj);
 							}
-							AquaFrame.initializeTable();
+							AquaFrame.updateJTable();
 							AquaFrame.panel.repaint();
-							AquaFrame.btnAddAnimal.setEnabled(true);
+							AquaFrame.enableAllButtons();
 							dispose();
 						} catch (NumberFormatException ex) {
 							JOptionPane.showMessageDialog(frame, "Fields must contain numbers!");
@@ -127,6 +158,8 @@ public class AddAnimalDialog extends JDialog {
 							JOptionPane.showMessageDialog(frame, "Size must be between 20 to 320!");
 						} catch (IllegalArgumentException ex) {
 							JOptionPane.showMessageDialog(frame, "Speed must be between 1 to 10!");
+						}catch (ArithmeticException ex) {
+							JOptionPane.showMessageDialog(frame, "Frequency must be between 8 to 24!");
 						}
 					}
 				});
@@ -138,7 +171,7 @@ public class AddAnimalDialog extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						AquaFrame.btnAddAnimal.setEnabled(true);
+						AquaFrame.enableAllButtons();
 						dispose();
 					}
 				});

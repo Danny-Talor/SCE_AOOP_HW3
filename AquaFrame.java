@@ -2,6 +2,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 @SuppressWarnings("serial")
 public class AquaFrame extends JFrame {
@@ -21,8 +23,14 @@ public class AquaFrame extends JFrame {
 
 	static JButton btnAddAnimal;
 	static JButton btnDupeAnimal;
+	static JButton btnDecorator;
 	static JButton btnAddPlant;
 	static JButton btnFood;
+	static JButton btnNewButton;
+	static JButton btnInfo;
+	static JButton btnReset;
+	static JButton btnWakeUp;
+	static JButton btnSleep;
 
 	/**
 	 * Launch the application.
@@ -44,26 +52,25 @@ public class AquaFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public AquaFrame() {
-		
-		
-		JFrame frame = new JFrame(); //Send to JOptionPane constructor to
-		frame.setAlwaysOnTop(true);  //make sure error dialogs are always on top
-		
-		
+
+		JFrame frame = new JFrame(); // Send to JOptionPane constructor to
+		frame.setAlwaysOnTop(true); // make sure error dialogs are always on top
+
 		//
 		// AquaFrame properties
 		//
 		setResizable(false);
 		setTitle("HW3");
-		setBounds(100, 100, 950, 600);
+		setBounds(100, 100, 1010, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		getContentPane().setLayout(null);
 
 		//
 		// AquaPanel properties
 		//
 		panel.setOpaque(false);
 		panel.setLocation(0, 0);
-		panel.setSize(936, 541);
+		panel.setSize(996, 541);
 		panel.setRequestFocusEnabled(false);
 		panel.setLayout(null);
 
@@ -72,8 +79,8 @@ public class AquaFrame extends JFrame {
 		horizontalBox.setBorder(null);
 		horizontalBox.setForeground(SystemColor.menuText);
 		horizontalBox.setBackground(SystemColor.info);
-		horizontalBox.setBounds(0, 512, 936, 29);
-		panel.add(horizontalBox);
+		horizontalBox.setBounds(0, 512, 996, 29);
+		getContentPane().add(horizontalBox);
 
 		//
 		// HorizontalBox left glue
@@ -93,12 +100,10 @@ public class AquaFrame extends JFrame {
 					AddAnimalDialog addAnimalDialog = new AddAnimalDialog();
 					addAnimalDialog.setVisible(true);
 					addAnimalDialog.setAlwaysOnTop(true);
-					btnAddAnimal.setEnabled(false);
+					disableAllButtons();
 				}
 			}
 		});
-		btnAddAnimal.setFont(new Font("Arial", Font.BOLD, 17));
-		horizontalBox.add(btnAddAnimal);
 
 		//
 		// AddPlant button
@@ -113,10 +118,13 @@ public class AquaFrame extends JFrame {
 					AddPlantDialog addPlantDialog = new AddPlantDialog();
 					addPlantDialog.setVisible(true);
 					addPlantDialog.setAlwaysOnTop(true);
-					btnAddPlant.setEnabled(false);
+					disableAllButtons();
 				}
 			}
 		});
+		horizontalBox.add(btnAddPlant);
+		btnAddAnimal.setFont(new Font("Arial", Font.BOLD, 17));
+		horizontalBox.add(btnAddAnimal);
 
 		//
 		// Duplicate animal button
@@ -134,18 +142,34 @@ public class AquaFrame extends JFrame {
 					DupeAnimalDialog dupeAnimalDialog = new DupeAnimalDialog();
 					dupeAnimalDialog.setVisible(true);
 					dupeAnimalDialog.setAlwaysOnTop(true);
-					btnDupeAnimal.setEnabled(false);
+					disableAllButtons();
 				}
 			}
 		});
 		btnDupeAnimal.setFont(new Font("Arial", Font.BOLD, 17));
 		horizontalBox.add(btnDupeAnimal);
-		horizontalBox.add(btnAddPlant);
+
+		btnDecorator = new JButton("Decorator");
+		btnDecorator.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (AquaPanel.sealife.size() == 0)
+					JOptionPane.showMessageDialog(frame,
+							"No animals to decorate!");
+				else {
+					JPanelDecorator decorator = new JPanelDecorator();
+					decorator.setVisible(true);
+					decorator.setAlwaysOnTop(true);
+					disableAllButtons();
+				}
+			}
+		});
+		btnDecorator.setFont(new Font("Arial", Font.BOLD, 17));
+		horizontalBox.add(btnDecorator);
 
 		//
 		// Sleep button
 		//
-		JButton btnSleep = new JButton("Sleep");
+		btnSleep = new JButton("Sleep");
 		btnSleep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.sleepFish();
@@ -157,7 +181,7 @@ public class AquaFrame extends JFrame {
 		//
 		// Wake up button
 		//
-		JButton btnWakeUp = new JButton("Wake up");
+		btnWakeUp = new JButton("Wake up");
 		btnWakeUp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.wakeFish();
@@ -169,7 +193,7 @@ public class AquaFrame extends JFrame {
 		//
 		// Reset button
 		//
-		JButton btnReset = new JButton("Reset");
+		btnReset = new JButton("Reset");
 		btnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				AquaPanel.plants.clear();
@@ -188,7 +212,8 @@ public class AquaFrame extends JFrame {
 		btnFood.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.drawWorm();
-				panel.createBarrier();
+				if (AquaPanel.sealife.size() > 1)
+					panel.createBarrier();
 			}
 		});
 		btnFood.setFont(new Font("Arial", Font.BOLD, 17));
@@ -197,12 +222,12 @@ public class AquaFrame extends JFrame {
 		//
 		// Info button (table with creatures)
 		//
-		JButton btnInfo = new JButton("Info");
+		btnInfo = new JButton("Info");
 		btnInfo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (scrollPane.isVisible()) {
 					scrollPane.setVisible(false);
-					initializeTable();
+					updateJTable();
 				} else {
 					scrollPane.setVisible(true);
 				}
@@ -215,7 +240,7 @@ public class AquaFrame extends JFrame {
 		//
 		// Exit button
 		//
-		JButton btnNewButton = new JButton("Exit");
+		btnNewButton = new JButton("Exit");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
@@ -231,32 +256,32 @@ public class AquaFrame extends JFrame {
 		horizontalBox.add(horizontalGlue_1);
 
 		//
-		// Scrollpane properties (to hold info table)
-		//
-		scrollPane.setEnabled(false);
-		scrollPane.setLocation(0, 0);
-		scrollPane.setSize(936, 500);
-		scrollPane.setAutoscrolls(true);
-		scrollPane.setFocusable(false);
-		scrollPane.setVisible(false);
-
-		//
 		// Table constructor
 		//
 		tableModel = new DefaultTableModel(tableHeaders, 0);
+
+		//
+		// Scrollpane properties (to hold info table)
+		//
+		scrollPane.setEnabled(false);
+		scrollPane.setAutoscrolls(true);
+		scrollPane.setFocusable(false);
+		scrollPane.setVisible(false);
 		table.setModel(tableModel);
 		scrollPane.setViewportView(table); // add table to scrollpane
-
-		getContentPane().add(layeredPane, BorderLayout.CENTER); // add a layered pane containing all panels
+		layeredPane.setBounds(0, 0, 996, 541);
 
 		// layered pane layers:
 		// layer 0 - color panel
 		// layer 1 - image panel
 		// layer 2 - fish panel
 		// layer 3 - scrollpane(table)
+		// layer 4 - decorator panel
+		getContentPane().add(layeredPane); // add a layered pane containing all panels
 		layeredPane.add(panel);
 		layeredPane.setLayer(panel, 2);
-		layeredPane.add(scrollPane);
+		scrollPane.setBounds(88, 0, 832, 379);
+		panel.add(scrollPane);
 		layeredPane.setLayer(scrollPane, 3);
 
 		JPanel imagePanel = new JPanel() {
@@ -266,13 +291,13 @@ public class AquaFrame extends JFrame {
 				g.drawImage(i, 0, 0, this.getSize().width, this.getSize().height, this);
 			}
 		};
-		imagePanel.setBounds(0, 0, 936, 541);
+		imagePanel.setBounds(0, 0, 996, 541);
 		layeredPane.add(imagePanel);
 		layeredPane.setLayer(imagePanel, 1);
 		imagePanel.setVisible(false);
 
 		JPanel colorPanel = new JPanel();
-		colorPanel.setBounds(0, 0, 936, 541);
+		colorPanel.setBounds(0, 0, 996, 541);
 		layeredPane.add(colorPanel);
 		layeredPane.setLayer(colorPanel, 0);
 
@@ -365,14 +390,38 @@ public class AquaFrame extends JFrame {
 	/**
 	 * Adds fish and jellyfish information to the table.
 	 */
-	public static void initializeTable() {
+	public static void updateJTable() {
 		AquaFrame.tableModel.setRowCount(0);
 		for (Swimmable animal : AquaPanel.sealife) {
-			Object[] objs = { animal.getAnimalName(), animal.getColor(), animal.getSize(), animal.getHorSpeed(),
+			Object[] objs = { animal.getAnimalName(), animal.getColorName(), animal.getSize(), animal.getHorSpeed(),
 					animal.getVerSpeed(), animal.getEatCount() };
 			AquaFrame.tableModel.addRow(objs);
 		}
 		Object[] total = { "Total", "", "", "", "", totalEatCounter };
 		AquaFrame.tableModel.addRow(total);
+	}
+
+	public static void disableAllButtons() {
+		btnAddAnimal.setEnabled(false);
+		btnDupeAnimal.setEnabled(false);
+		btnDecorator.setEnabled(false);
+		btnAddPlant.setEnabled(false);
+		btnFood.setEnabled(false);
+		btnInfo.setEnabled(false);
+		btnReset.setEnabled(false);
+		btnWakeUp.setEnabled(false);
+		btnSleep.setEnabled(false);
+	}
+
+	public static void enableAllButtons() {
+		btnAddAnimal.setEnabled(true);
+		btnDupeAnimal.setEnabled(true);
+		btnDecorator.setEnabled(true);
+		btnAddPlant.setEnabled(true);
+		btnFood.setEnabled(true);
+		btnInfo.setEnabled(true);
+		btnReset.setEnabled(true);
+		btnWakeUp.setEnabled(true);
+		btnSleep.setEnabled(true);
 	}
 }

@@ -37,7 +37,7 @@ public class AddPlantDialog extends JDialog {
 		contentPanel.add(plantType_cb);
 
 		plantSize_txtField = new JTextField();
-		plantSize_txtField.setToolTipText("20-320 pixels");
+		plantSize_txtField.setToolTipText("100-400 pixels");
 		plantSize_txtField.setBounds(117, 77, 96, 19);
 		contentPanel.add(plantSize_txtField);
 		plantSize_txtField.setColumns(10);
@@ -75,14 +75,14 @@ public class AddPlantDialog extends JDialog {
 								SeaCreature obj = factory.produceSeaCreature("Zostera");
 								AquaPanel.plants.add((Immobile)obj);
 							}
-							AquaFrame.initializeTable();
+							AquaFrame.updateJTable();
 							AquaFrame.panel.repaint();
-							AquaFrame.btnAddPlant.setEnabled(true);
+							AquaFrame.enableAllButtons();
 							dispose();
 						} catch (NumberFormatException ex) {
 							JOptionPane.showMessageDialog(frame, "Field must contain numbers!");
 						} catch (IllegalStateException ex) {
-							JOptionPane.showMessageDialog(frame, "Size must be between 20 to 320!");
+							JOptionPane.showMessageDialog(frame, "Size must be between 100 to 400!");
 						}
 					}
 				});
@@ -94,7 +94,7 @@ public class AddPlantDialog extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						AquaFrame.btnAddPlant.setEnabled(true);
+						AquaFrame.enableAllButtons();
 						dispose();
 					}
 				});

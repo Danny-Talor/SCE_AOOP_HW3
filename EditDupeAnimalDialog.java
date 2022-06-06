@@ -92,6 +92,7 @@ public class EditDupeAnimalDialog extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						try {
+							String animalType = animal.getAnimalName();
 							int size = Integer.parseInt(animalSize_txtField.getText());
 							int verSpd = Integer.parseInt(animalVerSpd_txtField.getText());
 							int horSpd = Integer.parseInt(animalHorSpd_txtField.getText());
@@ -105,12 +106,18 @@ public class EditDupeAnimalDialog extends JDialog {
 
 							Color c = colorByIndex(animalColor_cb.getSelectedIndex());
 
-							AbstractSeaFactory factory = new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c);
+							AbstractSeaFactory factory = null;
+							if(animalType.equals("Fish")) {
+								factory = new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c, animal.getHungerFreq());
+							}
+							else {
+								factory = new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c);
+							}
 							SeaCreature obj = factory.produceSeaCreature(animal.getAnimalName());
 							AquaPanel.sealife.add((Swimmable) obj);
-							AquaFrame.initializeTable();
+							AquaFrame.updateJTable();
 							AquaFrame.panel.repaint();
-							AquaFrame.btnDupeAnimal.setEnabled(true);
+							AquaFrame.enableAllButtons();
 							dispose();
 						} catch (NumberFormatException ex) {
 							JOptionPane.showMessageDialog(frame, "Fields must contain numbers!");
@@ -129,7 +136,7 @@ public class EditDupeAnimalDialog extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						AquaFrame.btnDupeAnimal.setEnabled(true);
+						AquaFrame.enableAllButtons();
 						dispose();
 					}
 				});
