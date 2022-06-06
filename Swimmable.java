@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.concurrent.CyclicBarrier;
 
@@ -47,6 +48,12 @@ public abstract class Swimmable extends Thread implements SeaCreature{
 
 	abstract public int getEatCount();
 
-	abstract public String getColor();
+	abstract public String getColorName();
+	
+	abstract public Color getColor();
+	
+	abstract public void setColor(Color c);
+	
+	abstract public int getHungerFreq();
 
 }

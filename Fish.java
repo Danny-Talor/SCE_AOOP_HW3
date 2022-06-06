@@ -1,7 +1,9 @@
 import java.awt.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.concurrent.*;
 
-public class Fish extends Swimmable{
+public class Fish extends Swimmable {
 	private int EAT_DISTANCE = 4;
 	private int size;
 	private Color col;
@@ -9,17 +11,11 @@ public class Fish extends Swimmable{
 	private int x_front, y_front, x_dir, y_dir;
 	private boolean isSuspended = false;
 	private CyclicBarrier barrier = null;
-
-	public Fish() {
-		super();
-		this.size = 20;
-		this.col = new Color(30, 60, 70);
-		this.x_front = 0;
-		this.y_front = 0;
-		this.eatCount = 0;
-		this.x_dir = 1;
-		this.y_dir = 1;
-	}
+	private PropertyChangeSupport support;
+	private boolean supportFiredFlag = false;
+	private int hungerFreq;
+	private int hungerTick = 0;
+	private HungerState hungerState;
 
 	/**
 	 * Creates a new fish
@@ -31,7 +27,7 @@ public class Fish extends Swimmable{
 	 * @param verSpeed as {@code int} to be given.
 	 * @param col      as {@code int} to be given.
 	 */
-	public Fish(int size, int x_front, int y_front, int horSpeed, int verSpeed, Color col) {
+	public Fish(int size, int x_front, int y_front, int horSpeed, int verSpeed, Color col, int hungerFreq) {
 		super(horSpeed, verSpeed);
 		this.size = size;
 		this.col = col;
@@ -40,6 +36,9 @@ public class Fish extends Swimmable{
 		this.eatCount = 0;
 		this.x_dir = 1;
 		this.y_dir = 1;
+		support = new PropertyChangeSupport(this);
+		this.hungerFreq = hungerFreq;
+		hungerState = new Satiated();
 	}
 
 	public Fish(Fish other) {
@@ -102,7 +101,7 @@ public class Fish extends Swimmable{
 	/**
 	 * @return String with the color of the fish
 	 */
-	public String getColor() {
+	public String getColorName() {
 		String rgb = String.valueOf(this.col.getRed()) + "," + String.valueOf(this.col.getGreen()) + ","
 				+ String.valueOf(this.col.getBlue());
 		if (rgb.equals("255,0,0"))
@@ -123,6 +122,16 @@ public class Fish extends Swimmable{
 			return "Pink";
 		else
 			return rgb;
+	}
+	
+	@Override
+	public Color getColor() {
+		return this.col;
+	}
+	
+	@Override
+	public void setColor(Color c) {
+		this.col = c;
 	}
 
 	/**
@@ -204,10 +213,17 @@ public class Fish extends Swimmable{
 					}
 				}
 			} else {
-				if (AquaPanel.wormInstance == null)
-					move();
-				else
+					synchronized (this) {
+						if(hungerTick >= hungerFreq && supportFiredFlag == false) {
+						hungerState = new Hungry();
+						support.firePropertyChange("hungerState", this.hungerState instanceof Satiated, this.hungerState instanceof Hungry);
+						supportFiredFlag = true;
+					}
+				}
+				if (hungerState instanceof Hungry && AquaPanel.wormInstance != null)
 					eatWorm();
+				else
+					move();
 			}
 
 		} catch (InterruptedException e) {
@@ -224,14 +240,22 @@ public class Fish extends Swimmable{
 
 		this.x_front += horSpeed * x_dir;
 		this.y_front += verSpeed * y_dir;
-		if (x_front >= AquaFrame.panel.getWidth())
+		if (x_front >= AquaFrame.panel.getWidth()) {
 			x_dir = -1;
-		if (y_front >= AquaFrame.panel.getHeight())
+			if(hungerState instanceof Satiated) hungerTick++;
+		}
+		if (y_front >= AquaFrame.panel.getHeight()) {
 			y_dir = -1;
-		if (x_front <= 0)
+			if(hungerState instanceof Satiated) hungerTick++;
+		}
+		if (x_front <= 0) {
 			x_dir = 1;
-		if (y_front <= 0)
+			if(hungerState instanceof Satiated) hungerTick++;
+		}
+		if (y_front <= 0) {
 			y_dir = 1;
+			if(hungerState instanceof Satiated) hungerTick++;
+		}
 	}
 
 	public void eatWorm() {
@@ -245,7 +269,7 @@ public class Fish extends Swimmable{
 			}
 		}
 
-		//Calculate path to worm
+		// Calculate path to worm
 		double v_old = Math.sqrt(horSpeed * horSpeed + verSpeed * verSpeed);
 		double k = (Math.abs((double) y_front - (double) (AquaFrame.panel.getHeight()) / 2)
 				/ Math.abs((double) x_front - (double) (AquaFrame.panel.getWidth()) / 2));
@@ -262,18 +286,38 @@ public class Fish extends Swimmable{
 			y_dir = -1;
 		else
 			y_dir = 1;
-		
+
 		synchronized (this) {
 			// If fish is 5 pixels away from the worm
 			if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 5)
 					&& (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 5)) {
+				barrier = null;
+				hungerTick = 0;
+				hungerState = new Satiated();
+				supportFiredFlag = false;
 				AquaFrame.panel.wormEatenBy(this);
 				Singleton.set();
 				AquaPanel.wormInstance = null;
 				AquaFrame.btnFood.setEnabled(true);
 				AquaFrame.panel.repaint();
-				AquaFrame.initializeTable();
+				AquaFrame.updateJTable();
 			}
 		}
+	}
+
+	public void addPropertyChangeListener(PropertyChangeListener pcl) {
+		support.addPropertyChangeListener(pcl);
+	}
+
+	public int getHungerFreq() {
+		return hungerFreq;
+	}
+
+	public void setHungerState(HungerState state) {
+		hungerState = state;
+	}
+
+	public HungerState getHungerState() {
+		return hungerState;
 	}
 }
