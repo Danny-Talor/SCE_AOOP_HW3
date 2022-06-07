@@ -4,6 +4,7 @@ public class AnimalFactory implements AbstractSeaFactory {
 	private int size, x_pos, y_pos, horSpeed, verSpeed, hungerFreq;
 	private Color col;
 
+	//Fish
 	public AnimalFactory(int size, int x_pos, int y_pos, int horSpeed, int verSpeed, Color col, int hungerFreq) {
 		this.size = size;
 		this.x_pos=x_pos;
@@ -14,6 +15,7 @@ public class AnimalFactory implements AbstractSeaFactory {
 		this.hungerFreq = hungerFreq;
 	}
 	
+	//Jellyfish
 	public AnimalFactory(int size, int x_pos, int y_pos, int horSpeed, int verSpeed, Color col) {
 		this.size = size;
 		this.x_pos=x_pos;

@@ -2,7 +2,7 @@ import java.awt.*;
 import java.util.concurrent.*;
 
 public class Jellyfish extends Swimmable {
-	private int EAT_DISTANCE = 4;
+	private int countEatToGrow = 4;
 	private int size;
 	private Color col;
 	private int eatCount;
@@ -75,7 +75,7 @@ public class Jellyfish extends Swimmable {
 	 */
 	public void eatInc() {
 		this.eatCount++;
-		if (this.eatCount == this.EAT_DISTANCE) {
+		if (this.eatCount == this.countEatToGrow) {
 			this.eatCount = 0;
 			changeJellyfish();
 		}
@@ -121,7 +121,7 @@ public class Jellyfish extends Swimmable {
 	}
 	
 	@Override
-	public void setColor(Color c) {
+	public void PaintFish(Color c) {
 		this.col = c;
 	}
 
@@ -188,7 +188,7 @@ public class Jellyfish extends Swimmable {
 			y_dir = 1;
 
 		synchronized (this) {
-		if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 50) && (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 50) && (AquaPanel.wormInstance != null)) {
+		if ((Math.abs(AquaFrame.panel.getWidth() / 2 - x_front) <= 25) && (Math.abs(AquaFrame.panel.getHeight() / 2 - y_front) <= 25) && (AquaPanel.wormInstance != null)) {
 			AquaFrame.panel.wormEatenBy(this);
 			Singleton.set();
 			AquaPanel.wormInstance = null;

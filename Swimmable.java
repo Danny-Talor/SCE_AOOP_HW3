@@ -2,7 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.concurrent.CyclicBarrier;
 
-public abstract class Swimmable extends Thread implements SeaCreature{
+public abstract class Swimmable extends Thread implements SeaCreature, MarineAnimal{
 	protected int horSpeed;
 	protected int verSpeed;
 
@@ -52,7 +52,7 @@ public abstract class Swimmable extends Thread implements SeaCreature{
 	
 	abstract public Color getColor();
 	
-	abstract public void setColor(Color c);
+	abstract public void PaintFish(Color c);
 	
 	abstract public int getHungerFreq();
 

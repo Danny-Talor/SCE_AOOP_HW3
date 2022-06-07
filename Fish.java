@@ -4,7 +4,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.concurrent.*;
 
 public class Fish extends Swimmable {
-	private int EAT_DISTANCE = 4;
+	private final int countEatToGrow = 4;
 	private int size;
 	private Color col;
 	private int eatCount;
@@ -51,6 +51,13 @@ public class Fish extends Swimmable {
 		this.eatCount = other.eatCount;
 		this.x_dir = other.x_dir;
 		this.y_dir = other.y_dir;
+		this.isSuspended = other.isSuspended;
+		this.barrier = other.barrier;
+		this.support=other.support;
+		this.supportFiredFlag = other.supportFiredFlag;
+		this.hungerFreq=other.hungerFreq;
+		this.hungerTick = other.hungerTick;
+		this.hungerState=other.hungerState;
 	}
 
 	/**
@@ -85,7 +92,7 @@ public class Fish extends Swimmable {
 	 */
 	public void eatInc() {
 		this.eatCount++;
-		if (this.eatCount == this.EAT_DISTANCE) {
+		if (this.eatCount == this.countEatToGrow) {
 			this.eatCount = 0;
 			changeFish();
 		}
@@ -130,7 +137,7 @@ public class Fish extends Swimmable {
 	}
 	
 	@Override
-	public void setColor(Color c) {
+	public void PaintFish(Color c) {
 		this.col = c;
 	}
 

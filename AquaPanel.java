@@ -80,7 +80,7 @@ public class AquaPanel extends JPanel implements PropertyChangeListener{
 		g2.setStroke(new BasicStroke(1));
 	}
 
-	public void drawWorm() {
+	public void setWormInstance() {
 		if (AquaPanel.sealife.size() > 0) {
 			wormInstance = Singleton.getInstance();
 			repaint();
@@ -109,7 +109,7 @@ public class AquaPanel extends JPanel implements PropertyChangeListener{
 		int input = JOptionPane.showOptionDialog(frame, "Fish hungry!\nFeed now?", "Attention!", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
 		if(input == JOptionPane.OK_OPTION) {
 			wakeFish();
-			drawWorm();
+			setWormInstance();
 			if(AquaPanel.sealife.size()>1) createBarrier();
 		}
 		else {

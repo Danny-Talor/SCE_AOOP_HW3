@@ -2,8 +2,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 @SuppressWarnings("serial")
 public class AquaFrame extends JFrame {
@@ -211,7 +209,7 @@ public class AquaFrame extends JFrame {
 		btnFood = new JButton("Food");
 		btnFood.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel.drawWorm();
+				panel.setWormInstance();
 				if (AquaPanel.sealife.size() > 1)
 					panel.createBarrier();
 			}
@@ -323,6 +321,28 @@ public class AquaFrame extends JFrame {
 			}
 		});
 		mnMain.add(file_Exit);
+		
+		JMenu mnMemento = new JMenu("Memento");
+		menuBar.add(mnMemento);
+		
+		JMenuItem memento_saveBtn = new JMenuItem("Save Object State");
+		memento_saveBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SaveObjectDialog saveObjectDialog = new SaveObjectDialog();
+				saveObjectDialog.setVisible(true);
+				saveObjectDialog.setAlwaysOnTop(true);
+				disableAllButtons();
+			}
+		});
+		mnMemento.add(memento_saveBtn);
+		
+		JMenuItem memento_restoreBtn = new JMenuItem("Restore Object State");
+		memento_restoreBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(frame, "Work in Progress     :(");
+			}
+		});
+		mnMemento.add(memento_restoreBtn);
 
 		//
 		// Menu bar background button

@@ -121,10 +121,10 @@ public class DupeAnimalDialog extends JDialog {
 
 		if(animalType.equals("Fish")) {
 			int hungerFreq = Integer.parseInt(table.getModel().getValueAt(index, 5).toString());
-			return new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c, hungerFreq);
+			return new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c, hungerFreq); // Fish animal factory
 		}
 		else
-			return new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c);
+			return new AnimalFactory(size, x_pos, y_pos, horSpd, verSpd, c); //Jellyfish animal factory
 	}
 
 	public static void initializeTable() {

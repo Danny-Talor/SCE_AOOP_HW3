@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.border.*;
@@ -7,25 +8,26 @@ import javax.swing.border.*;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")
-public class JPanelDecorator extends JDialog {
+public class SaveObjectDialog extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 
 	JScrollPane scrollPane = new JScrollPane();
 	
-	String[] tableHeaders = new String[] { "Animal", "Color", "Size", "Hor. Speed", "Ver. Speed", "Eat Counter" };
+	String[] tableHeaders = new String[] { "Animal", "Color", "Size", "Hor. Speed", "Ver. Speed", "Date saved" };
 	static DefaultTableModel tableModel;
 	JTable table = new JTable() {
 		public boolean isCellEditable(int row, int column) {
 			return false;
 		};
 	};
-	
 	ArrayList<Swimmable> sealife = new ArrayList<>(AquaPanel.sealife);
+
+    //System.out.println(formatter.format(date));  
 	/**
 	 * Create the dialog.
 	 */
-	public JPanelDecorator() {
+	public SaveObjectDialog() {
 		JFrame frame = new JFrame();
 		frame.setAlwaysOnTop(true);
 		setTitle("Decorate (recolor) animal");
@@ -56,20 +58,12 @@ public class JPanelDecorator extends JDialog {
 				okButton.setFont(new Font("Tahoma", Font.BOLD, 12));
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						try {
-							
-							Swimmable obj = sealife.get(table.getSelectedRow());
-							Color color = JColorChooser.showDialog(frame, "Select a new color for the fish:", obj.getColor());
-							obj.PaintFish(color);
-							AquaPanel.sealife.add(obj);
-							AquaFrame.updateJTable();
-							updateJTable();
-						} catch (IndexOutOfBoundsException ex) {
-							JOptionPane.showMessageDialog(frame, "No animal selected!");
-						} catch (Exception ex) {
-							JOptionPane.showMessageDialog(frame, ex.getMessage());
-						}
-						
+						Originator originator = new Originator();
+						Swimmable obj = sealife.get(table.getSelectedRow());
+						originator.setState(obj); 
+						Memento memento = originator.createMemento(); 
+						CareTaker caretaker = new CareTaker();   		  	
+					    caretaker.addMemento(memento);
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -95,7 +89,7 @@ public class JPanelDecorator extends JDialog {
 		tableModel.setRowCount(0);
 		for (Swimmable animal : AquaPanel.sealife) {
 			Object[] objs = { animal.getAnimalName(), animal.getColorName(), animal.getSize(), animal.getHorSpeed(),
-					animal.getVerSpeed(), animal.getEatCount() };
+					animal.getVerSpeed(), saveDate };
 			tableModel.addRow(objs);
 		}
 	}
