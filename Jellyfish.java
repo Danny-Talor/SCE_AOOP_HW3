@@ -42,6 +42,11 @@ public class Jellyfish extends Swimmable {
 		this.x_dir = other.x_dir;
 		this.y_dir = other.y_dir;
 	}
+	
+	@Override
+	public Jellyfish clone() {
+		return new Jellyfish(size, x_front, y_front, horSpeed, verSpeed, col);
+	}
 
 	/**
 	 * @return String with the name of the animal
@@ -201,5 +206,25 @@ public class Jellyfish extends Swimmable {
 
 	public int getHungerFreq() {
 		return -1;
+	}
+	
+	@Override
+	public int getXpos() {
+		return x_front;
+	}
+
+	@Override
+	public int getYpos() {
+		return y_front;
+	}
+	
+	@Override
+	public void setState(int size, int x_front, int y_front, int horSpeed, int verSpeed, Color col) {
+		super.horSpeed = horSpeed;
+		super.verSpeed = verSpeed;
+		this.size = size;
+		this.col = col;
+		this.x_front = x_front;
+		this.y_front = y_front;
 	}
 }

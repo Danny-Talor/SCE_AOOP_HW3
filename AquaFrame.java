@@ -18,7 +18,9 @@ public class AquaFrame extends JFrame {
 			return false;
 		};
 	};
-
+	
+	static CareTaker caretaker = new CareTaker();
+	
 	static JButton btnAddAnimal;
 	static JButton btnDupeAnimal;
 	static JButton btnDecorator;
@@ -339,7 +341,10 @@ public class AquaFrame extends JFrame {
 		JMenuItem memento_restoreBtn = new JMenuItem("Restore Object State");
 		memento_restoreBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(frame, "Work in Progress     :(");
+				RestoreObjectDialog restoreObjectDialog = new RestoreObjectDialog();
+				restoreObjectDialog.setVisible(true);
+				restoreObjectDialog.setAlwaysOnTop(true);
+				disableAllButtons();
 			}
 		});
 		mnMemento.add(memento_restoreBtn);

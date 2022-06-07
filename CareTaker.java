@@ -1,15 +1,15 @@
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 
 
 public class CareTaker { 
-	private HashSet<Memento> statesList = new HashSet<>(); 
-	public void addMemento(Memento m) { 
-		statesList.add(m); 
+	public HashMap<Integer,Memento> statesList = new HashMap<>(); 
+	
+	public void addMemento(int id, Memento m) { 
+		statesList.put(id,m);
 	} 
 	
 	public Memento getMemento(int index) { 
-		ArrayList<Memento> mList = new ArrayList<>(statesList);
-		return mList.get(index); 
+		
+		return statesList.get(index);
 	} 
 }

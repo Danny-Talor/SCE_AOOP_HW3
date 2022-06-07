@@ -8,13 +8,13 @@ import javax.swing.border.*;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")
-public class SaveObjectDialog extends JDialog {
+public class RestoreObjectDialog extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 
 	JScrollPane scrollPane = new JScrollPane();
 	
-	String[] tableHeaders = new String[] { "Animal", "Color", "Size", "Hor. Speed", "Ver. Speed", "Eat counter" };
+	String[] tableHeaders = new String[] { "Animal", "Color", "Size", "Hor. Speed", "Ver. Speed", "Save Time" };
 	static DefaultTableModel tableModel;
 	JTable table = new JTable() {
 		public boolean isCellEditable(int row, int column) {
@@ -22,14 +22,13 @@ public class SaveObjectDialog extends JDialog {
 		};
 	};
 	ArrayList<Swimmable> sealife = new ArrayList<>(AquaPanel.sealife);
-
 	/**
 	 * Create the dialog.
 	 */
-	public SaveObjectDialog() {
+	public RestoreObjectDialog() {
 		JFrame frame = new JFrame();
 		frame.setAlwaysOnTop(true);
-		setTitle("Save animal state");
+		setTitle("Restore animal state");
 		setBounds(100, 100, 731, 329);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -44,24 +43,23 @@ public class SaveObjectDialog extends JDialog {
 			updateJTable();
 		}
 
-		JLabel lblNewLabel = new JLabel("Select animal:");
+		JLabel lblNewLabel = new JLabel("Select animal state:");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lblNewLabel.setBounds(0, 0, 149, 21);
+		lblNewLabel.setBounds(0, 0, 174, 21);
 		contentPanel.add(lblNewLabel);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Save Animal State");
+				JButton okButton = new JButton("Restore state");
 				okButton.setFont(new Font("Tahoma", Font.BOLD, 12));
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						Originator originator = new Originator();
+						Memento m = AquaFrame.caretaker.getMemento(table.getSelectedRow());
 						Swimmable obj = sealife.get(table.getSelectedRow());
-						originator.setState(obj);
-						Memento memento = originator.createMemento();
-					    AquaFrame.caretaker.addMemento(table.getSelectedRow(),memento);
+						obj.setState(m.getSize(), m.getX_front(), m.getY_front(), m.getHorSpeed(), m.getVerSpeed(), m.getColor());
+						AquaPanel.sealife.add(obj);
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -85,11 +83,11 @@ public class SaveObjectDialog extends JDialog {
 	
 	public static void updateJTable() {
 		tableModel.setRowCount(0);
-		for (Swimmable animal : AquaPanel.sealife) {
-			Object[] objs = { animal.getAnimalName(), animal.getColorName(), animal.getSize(), animal.getHorSpeed(), animal.getVerSpeed(), animal.getEatCount() };
+		for (Memento state : AquaFrame.caretaker.statesList.values()) {
+			Object[] objs = { state.getState().getAnimalName(), state.getColorRGB(), state.getSize(), state.getHorSpeed(),
+					state.getVerSpeed(), state.getSaveTime() };
 			tableModel.addRow(objs);
 		}
 	}
 	
 }
-
