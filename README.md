@@ -9,3 +9,5 @@
   - Decorator.
   - Memento.
   - State.
+
+![alt text](https://github.com/zebigdt/SCE_AOOP_HW3/blob/main/screenshot.png?raw=true)
